@@ -46,10 +46,15 @@ class TerminalViewController: UIViewController {
 	var bookmarkPanelViewController: PanelViewController!
 
 	private var overflowItems: [OverflowItem] = [] {
-		didSet { applyOverflowState() }
+		didSet {
+			applyOverflowState()
+		}
 	}
+	
 	private var overflowState: OverflowState = .compact {
-		didSet { applyOverflowState() }
+		didSet {
+			applyOverflowState()
+		}
 	}
 
 	init() {
@@ -71,18 +76,25 @@ class TerminalViewController: UIViewController {
 		]
 
 		historyPanelViewController = PanelViewController(with: historyViewController, in: self)
-		historyPanelViewController.view.backgroundColor = .panelBackgroundColor
+		historyPanelViewController.panelNavigationController.view.backgroundColor = .panelBackgroundColor
+		historyPanelViewController.view.backgroundColor = .clear
+		
 		scriptsPanelViewController = PanelViewController(with: scriptsViewController, in: self)
-		scriptsPanelViewController.view.backgroundColor = .panelBackgroundColor
+		scriptsPanelViewController.panelNavigationController.view.backgroundColor = .panelBackgroundColor
+		scriptsPanelViewController.view.backgroundColor = .clear
+
 		bookmarkPanelViewController = PanelViewController(with: bookmarkViewController, in: self)
-		bookmarkPanelViewController.view.backgroundColor = .panelBackgroundColor
+		bookmarkPanelViewController.panelNavigationController.view.backgroundColor = .panelBackgroundColor
+		bookmarkPanelViewController.view.backgroundColor = .clear
 
 		historyViewController.delegate = self
 		bookmarkViewController.delegate = self
 		terminalView.delegate = self
 	}
 
-	required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+	required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -97,10 +109,13 @@ class TerminalViewController: UIViewController {
 			contentWrapperView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
 			])
 
-		// Add terminal view as subview
-		terminalView.frame = contentWrapperView.bounds
-		terminalView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+		
 		contentWrapperView.addSubview(terminalView)
+		terminalView.translatesAutoresizingMaskIntoConstraints = false
+		terminalView.leadingAnchor.constraint(equalTo: contentWrapperView.leadingAnchor).isActive = true
+		terminalView.trailingAnchor.constraint(equalTo: contentWrapperView.trailingAnchor).isActive = true
+		terminalView.topAnchor.constraint(equalTo: contentWrapperView.topAnchor).isActive = true
+		terminalView.bottomAnchor.constraint(equalTo: contentWrapperView.bottomAnchor).isActive = true
 
 		updateTitle()
 
@@ -296,7 +311,7 @@ class TerminalViewController: UIViewController {
 		return [
 			// Navigation between commands
 			UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectPreviousCommand), discoverabilityTitle: "Previous command"),
-			UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectNextCommand), discoverabilityTitle: "Next command"),
+			UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectNextCommand), discoverabilityTitle: "Next command")
 		]
 	}
 
@@ -319,15 +334,19 @@ class TerminalViewController: UIViewController {
 
 		self.present(picker, animated: true, completion: nil)
 	}
+	
 	private func showHistory(_ sender: UIView) {
 		presentPopover(historyPanelViewController, from: sender)
 	}
+	
 	private func showScripts(_ sender: UIView) {
 		presentPopover(scriptsPanelViewController, from: sender)
 	}
+	
 	private func showBookmarks(_ sender: UIView) {
 		presentPopover(bookmarkPanelViewController, from: sender)
 	}
+	
 }
 
 extension TerminalViewController: UIDocumentPickerDelegate {
@@ -455,6 +474,10 @@ extension TerminalViewController: PanelManager {
 
 		savePanelStates()
 
+	}
+	
+	func maximumNumberOfPanelsPinned(at side: PanelPinSide) -> Int {
+		return 2
 	}
 
 }
@@ -617,7 +640,9 @@ private extension TerminalViewController {
 	}
 
 	private class OverflowBarButtonItem: UIBarButtonItem {
+		
 		var item: OverflowItem?
+		
 		convenience init(item: OverflowItem) {
 			self.init(image: item.icon, style: .plain, target: nil, action: #selector(onTap))
 			self.target = self
