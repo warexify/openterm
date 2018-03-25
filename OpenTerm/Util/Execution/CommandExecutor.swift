@@ -88,6 +88,7 @@ class CommandExecutor {
 
 		CommandExecutor.executionQueue.async {
 			self.state = .running
+			ios_switchSession(self.stdout_file) 
 
 			// Set the executor's CWD as the process-wide CWD
 			DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
@@ -191,6 +192,8 @@ struct SystemExecutorCommand: CommandExecutorCommand {
 	func run(forExecutor executor: CommandExecutor) throws -> ReturnCode {
 
 		// Pass the value of the string to system, return its exit code.
+		thread_stdout = nil;
+		thread_stderr = nil;
 		let returnCode = ios_system(command.utf8CString)
 
 		// Flush pipes to make sure all data is read
