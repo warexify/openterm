@@ -5,10 +5,10 @@
       location = "group:OpenTerm.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Dependencies/ios_system/ios_system.xcodeproj">
+      location = "group:../ios_system/ios_system.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Dependencies/network_ios/network_ios.xcodeproj">
+      location = "group:../network_ios/network_ios.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
