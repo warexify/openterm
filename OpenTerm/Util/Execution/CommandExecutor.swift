@@ -92,6 +92,7 @@ class CommandExecutor {
 
 			// Set the executor's CWD as the process-wide CWD
 			DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
+			// ios_system requires these to be set (so pipe works, and commands that call commands).
 			stdin = self.stdin_file
 			stdout = self.stdout_file
 			stderr = self.stderr_file
@@ -129,6 +130,12 @@ class CommandExecutor {
 			self.state = .idle
 		}
 	}
+	
+	func closeSession() {
+		// Warn ios_system to release all data associated with this session:
+		// current directory, previous directory...
+		ios_closeSession(self.stdout_file)
+	}
 
 	// Send input to the running command's stdin.
 	func sendInput(_ input: String) {
@@ -138,7 +145,7 @@ class CommandExecutor {
 		
 		switch input {
 		case Parser.Code.endOfText.rawValue, Parser.Code.endOfTransmission.rawValue:
-			// Kill running process on CTRL+C or CTRL+D.
+			// Kill running process in the current session (tab) on CTRL+C or CTRL+D.
 			// No way to send different kill signals since ios_system/pthread are running in process.
 			ios_kill()
 		default:
@@ -191,9 +198,10 @@ struct SystemExecutorCommand: CommandExecutorCommand {
 
 	func run(forExecutor executor: CommandExecutor) throws -> ReturnCode {
 
-		// Pass the value of the string to system, return its exit code.
+		// ios_system requires these to be set to nil before command execution
 		thread_stdout = nil;
 		thread_stderr = nil;
+		// Pass the value of the string to system, return its exit code.
 		let returnCode = ios_system(command.utf8CString)
 
 		// Flush pipes to make sure all data is read
