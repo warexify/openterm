@@ -88,10 +88,10 @@ class CommandExecutor {
 
 		CommandExecutor.executionQueue.async {
 			self.state = .running
-			ios_switchSession(self.stdout_file) 
-
 			// Set the executor's CWD as the process-wide CWD
-			DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
+			ios_switchSession(self.stdout_file)
+
+			// DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
 			// ios_system requires these to be set (so pipe works, and commands that call commands).
 			stdin = self.stdin_file
 			stdout = self.stdout_file
@@ -143,6 +143,7 @@ class CommandExecutor {
 			return
 		}
 		
+		ios_switchSession(self.stdout_file) 
 		switch input {
 		case Parser.Code.endOfText.rawValue, Parser.Code.endOfTransmission.rawValue:
 			// Kill running process in the current session (tab) on CTRL+C or CTRL+D.
