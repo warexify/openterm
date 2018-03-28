@@ -50,10 +50,7 @@ class BookmarkViewController: UIViewController {
 	/// When the + button is pressed, we notify the delegate to save the current
 	/// directory as URL.
 	@objc func addBookmarkForCurrentDirectory() {
-		guard let url = self.delegate?.currentDirectoryURL else {
-			return
-		}
-		
+		guard let url = self.delegate?.currentDirectoryURL else { return }
 		do {
 			try self.bookmarkManager.saveBookmarkURL(url: url)
 		} catch {
