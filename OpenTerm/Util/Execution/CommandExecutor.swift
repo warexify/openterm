@@ -83,19 +83,14 @@ class CommandExecutor {
 
 	// Dispatch a new text-based command to execute.
 	func dispatch(_ command: String) {
-		let push_stdin = stdin
-		let push_stdout = stdout
-		let push_stderr = stderr
 
 		executionQueue.async {
 			self.state = .running
-			// ios_system requires these to be set (so pipe works, and commands that call commands).
-			stdin = self.stdin_file
-			stdout = self.stdout_file
-			stderr = self.stderr_file
+
+			// DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
 			// Set the executor's CWD as the process-wide CWD
 			ios_switchSession(self.stdout_file)
-			// DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
+			ios_setStreams(self.stdin_file, self.stdout_file, self.stderr_file)
 			let returnCode: ReturnCode
 			do {
 				let executorCommand = self.executorCommand(forCommand: command, inContext: self.context)
@@ -122,10 +117,6 @@ class CommandExecutor {
 			// Write the end code to stdout_pipe
 			// TODO: Also need to send to stderr?
 			self.stdout_pipe.fileHandleForWriting.write(Parser.Code.endOfTransmission.rawValue.data(using: .utf8)!)
-
-			stdin = push_stdin
-			stdout = push_stdout
-			stderr = push_stderr
 
 			self.state = .idle
 		}
