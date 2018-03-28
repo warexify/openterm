@@ -51,7 +51,8 @@ class CommandExecutor {
 	}
 
 	/// Dispatch queue to serially run commands on.
-	private static let executionQueue = DispatchQueue(label: "CommandExecutor", qos: .userInteractive)
+	// was static
+	private let executionQueue = DispatchQueue(label: "CommandExecutor", qos: .userInteractive)
 	/// Dispatch queue that delegate methods will be called on.
 	private let delegateQueue = DispatchQueue(label: "CommandExecutor-Delegate", qos: .userInteractive)
 
@@ -86,16 +87,15 @@ class CommandExecutor {
 		let push_stdout = stdout
 		let push_stderr = stderr
 
-		CommandExecutor.executionQueue.async {
+		executionQueue.async {
 			self.state = .running
-			// Set the executor's CWD as the process-wide CWD
-			ios_switchSession(self.stdout_file)
-
-			// DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
 			// ios_system requires these to be set (so pipe works, and commands that call commands).
 			stdin = self.stdin_file
 			stdout = self.stdout_file
 			stderr = self.stderr_file
+			// Set the executor's CWD as the process-wide CWD
+			ios_switchSession(self.stdout_file)
+			// DocumentManager.shared.currentDirectoryURL = self.currentWorkingDirectory
 			let returnCode: ReturnCode
 			do {
 				let executorCommand = self.executorCommand(forCommand: command, inContext: self.context)
