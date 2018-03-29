@@ -51,13 +51,6 @@
 		<string>cHLPRXafinprv</string>
 		<string>file</string>
 	</array>
-	<key>ctags</key>
-	<array>
-		<string>libctags.dylib</string>
-		<string>ctags_main</string>
-		<string>aBeFGnNoRvVx:b:d:D:f:h:I:L:</string>
-		<string>file</string>
-	</array>
 	<key>curl</key>
 	<array>
 		<string>curl_ios.framework/curl_ios</string>
@@ -219,6 +212,7 @@
 		<string>n</string>
 		<string>file</string>
 	</array>
+<<<<<<< HEAD
 	<key>readtags</key>
 	<array>
 		<string>libctags.dylib</string>
@@ -226,6 +220,8 @@
 		<string>aBeFGnNoRvVx:b:d:D:f:h:I:L:</string>
 		<string>file</string>
 	</array>
+=======
+>>>>>>> 1181395bbe385b8885a0c99db58e7d4dc427011c
 	<key>rlogin</key>
 	<array>
 		<string>network_ios.framework/network_ios</string>
