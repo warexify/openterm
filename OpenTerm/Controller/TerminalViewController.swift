@@ -68,11 +68,27 @@ class TerminalViewController: UIViewController {
 
 		super.init(nibName: nil, bundle: nil)
 
+		let openFolderItem = OverflowItem(visibleInBar: true, icon: #imageLiteral(resourceName: "Open"), title: "Open", action: { [weak self] sender in
+			self?.showDocumentPicker(sender)
+		})
+		
+		let bookmarksItem = OverflowItem(visibleInBar: true, icon: #imageLiteral(resourceName: "Bookmarks"), title: "Bookmarks", action: { [weak self] sender in
+			self?.showBookmarks(sender)
+		})
+		
+		let historyItem = OverflowItem(visibleInBar: true, icon: #imageLiteral(resourceName: "History"), title: "History", action: { [weak self] sender in
+			self?.showHistory(sender)
+		})
+		
+		let scriptsItem = OverflowItem(visibleInBar: true, icon: #imageLiteral(resourceName: "Script"), title: "Scripts", action: { [weak self] sender in
+			self?.showScripts(sender)
+		})
+
 		overflowItems = [
-			.init(visibleInBar: true, icon: #imageLiteral(resourceName: "Open"), title: "Open", action: self.showDocumentPicker),
-			.init(visibleInBar: true, icon: #imageLiteral(resourceName: "Bookmarks"), title: "Bookmarks", action: self.showBookmarks),
-			.init(visibleInBar: true, icon: #imageLiteral(resourceName: "History"), title: "History", action: self.showHistory),
-			.init(visibleInBar: false, icon: #imageLiteral(resourceName: "Script"), title: "Scripts", action: self.showScripts)
+			openFolderItem,
+			bookmarksItem,
+			historyItem,
+			scriptsItem
 		]
 
 		historyPanelViewController = PanelViewController(with: historyViewController, in: self)
@@ -102,21 +118,25 @@ class TerminalViewController: UIViewController {
 		// Content wrapper is root view
 		contentWrapperView.translatesAutoresizingMaskIntoConstraints = false
 		view.addSubview(contentWrapperView)
+		
 		NSLayoutConstraint.activate([
 			contentWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			contentWrapperView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 			contentWrapperView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-			contentWrapperView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+			contentWrapperView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 			])
 
 		
-		contentWrapperView.addSubview(terminalView)
 		terminalView.translatesAutoresizingMaskIntoConstraints = false
-		terminalView.leadingAnchor.constraint(equalTo: contentWrapperView.leadingAnchor).isActive = true
-		terminalView.trailingAnchor.constraint(equalTo: contentWrapperView.trailingAnchor).isActive = true
-		terminalView.topAnchor.constraint(equalTo: contentWrapperView.topAnchor).isActive = true
-		terminalView.bottomAnchor.constraint(equalTo: contentWrapperView.bottomAnchor).isActive = true
-
+		contentWrapperView.addSubview(terminalView)
+		
+		NSLayoutConstraint.activate([
+			terminalView.leadingAnchor.constraint(equalTo: contentWrapperView.leadingAnchor),
+			terminalView.trailingAnchor.constraint(equalTo: contentWrapperView.trailingAnchor),
+			terminalView.topAnchor.constraint(equalTo: contentWrapperView.topAnchor),
+			terminalView.bottomAnchor.constraint(equalTo: contentWrapperView.bottomAnchor)
+			])
+		
 		updateTitle()
 
 		NotificationCenter.default.addObserver(self, selector: #selector(didDismissKeyboard), name: .UIKeyboardDidHide, object: nil)
@@ -427,7 +447,7 @@ extension TerminalViewController: TerminalViewDelegate {
 
 		if command == "exit" {
 			if let parent = self.parent as? TerminalTabViewController {
-				terminalView.executor.closeSession(); 
+				terminalView.executor.closeSession()
 				parent.closeTab(self)
 			}
 			return

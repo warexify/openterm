@@ -31,7 +31,9 @@ class TerminalView: UIView {
 	var stdoutParser = Parser()
 	var stderrParser = Parser()
 	var currentCommandStartIndex: String.Index! {
-		didSet { self.updateAutoComplete() }
+		didSet {
+			self.updateAutoComplete()
+		}
 	}
 
 	weak var delegate: TerminalViewDelegate?
@@ -78,19 +80,40 @@ class TerminalView: UIView {
 
 		self.setupAutoComplete()
 
-		keyboardObserver.observe { (state) in
-
-			let rect = self.textView.convert(state.keyboardFrameEnd, from: nil).intersection(self.textView.bounds)
-
-			UIView.animate(withDuration: state.duration, delay: 0.0, options: state.options, animations: {
-
-				self.textView.contentInset.bottom = rect.height
-				self.textView.scrollIndicatorInsets.bottom = rect.height
-
-			}, completion: nil)
-
+		textView.contentInsetAdjustmentBehavior = .always
+		
+		keyboardObserver.observe { [weak self] (state) in
+			self?.adjustInsets(for: state)
 		}
 
+	}
+	
+	private func adjustInsets(for state: KeyboardEvent) {
+		
+		let rect = self.textView.convert(state.keyboardFrameEnd, from: nil).intersection(self.textView.bounds)
+		
+		UIView.animate(withDuration: state.duration, delay: 0.0, options: state.options, animations: {
+			
+			if rect.height == 0 {
+				
+				// Keyboard is not visible.
+				
+				self.textView.contentInset.bottom = 0
+				self.textView.scrollIndicatorInsets.bottom = 0
+				
+			} else {
+				
+				// Keyboard is visible, keyboard height includes safeAreaInsets.
+				
+				let bottomInset = rect.height - self.safeAreaInsets.bottom
+				
+				self.textView.contentInset.bottom = bottomInset
+				self.textView.scrollIndicatorInsets.bottom = bottomInset
+				
+			}
+			
+		}, completion: nil)
+		
 	}
 
 	/// Performs the given block on the main thread, without dispatching if already there.
