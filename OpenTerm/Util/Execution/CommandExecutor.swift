@@ -190,13 +190,8 @@ struct SystemExecutorCommand: CommandExecutorCommand {
 	func run(forExecutor executor: CommandExecutor) throws -> ReturnCode {
 
 		// ios_system requires these to be set to nil before command execution
-<<<<<<< HEAD
-		thread_stdout = nil;
-		thread_stderr = nil;
-=======
 		thread_stdout = nil
 		thread_stderr = nil
->>>>>>> de9c256ad42607f301128f2f52f0c8ae5fd4377e
 		// Pass the value of the string to system, return its exit code.
 		let returnCode = ios_system(command.utf8CString)
 
