@@ -35,6 +35,23 @@ class TerminalView: UIView {
 			self.updateAutoComplete()
 		}
 	}
+	
+	var columnWidth: Int {
+		
+		guard let font = textView.font else {
+			assertionFailure("Expected font")
+			return 0
+		}
+		
+		// TODO: check if the bounds includes the safe area (on iPhone X)
+		let viewWidth = textView.bounds.width
+
+		let dummyAtributedString = NSAttributedString(string: "X", attributes: [.font: font])
+		let charWidth = dummyAtributedString.size().width
+		
+		// Assumes the font is monospaced
+		return Int(viewWidth / charWidth)
+	}
 
 	weak var delegate: TerminalViewDelegate?
 

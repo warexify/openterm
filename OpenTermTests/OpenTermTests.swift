@@ -33,7 +33,7 @@ class OpenTermTests: XCTestCase {
 		
 		let commands = terminalVC.availableCommands()
 		
-		let expectedCommands = ["awk", "cat", "cd", "chflags", "chksum", "clear", "compress", "cp", "curl", "date", "dig", "du", "echo", "egrep", "env", "fgrep", "grep", "gunzip", "gzip", "help", "host", "link", "ln", "ls", "mkdir", "mv", "nc", "nslookup", "open-url", "pbcopy", "pbpaste", "ping", "printenv", "pwd", "readlink", "rlogin", "rm", "rmdir", "scp", "sed", "setenv", "sftp", "share", "ssh", "ssh-keygen", "stat", "sum", "tar", "tee", "telnet", "touch", "tr", "uname", "uncompress", "unlink", "unsetenv", "uptime", "wc", "whoami"]
+		let expectedCommands = ["awk", "cat", "cd", "chflags", "chksum", "clear", "compress", "cp", "credits", "curl", "date", "dig", "du", "echo", "egrep", "env", "fgrep", "grep", "gunzip", "gzip", "help", "host", "link", "ln", "ls", "mkdir", "mv", "nc", "nslookup", "open-url", "pbcopy", "pbpaste", "ping", "printenv", "pwd", "readlink", "rlogin", "rm", "rmdir", "scp", "sed", "setenv", "sftp", "share", "ssh", "ssh-keygen", "stat", "sum", "tar", "tee", "telnet", "touch", "tr", "uname", "uncompress", "unlink", "unsetenv", "uptime", "wc", "whoami"]
 		
 		XCTAssertEqual(commands, expectedCommands)
 		
@@ -109,7 +109,7 @@ class OpenTermTests: XCTestCase {
 
 		let expectedOutput = "\(deviceName): curl: try \'curl --help\' or \'curl --manual\' for more information\n\(deviceName): "
 		
-		DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
 			
 			let output = terminalView.textView.text
 			
@@ -118,7 +118,7 @@ class OpenTermTests: XCTestCase {
 			delayExpectation.fulfill()
 		}
 
-		waitForExpectations(timeout: 2)
+		waitForExpectations(timeout: 3)
 		
     }
 	
