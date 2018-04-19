@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum TokenType {
+public enum TokenType: Equatable {
 	
 	/// Token which has no effect on program, such as white space
 	case ignoreableToken
@@ -17,6 +17,7 @@ public enum TokenType {
 	case identifier(String)
 	case number(NumberType)
 	case string(String)
+	case editorPlaceholder(String)
 
 	case parensOpen
 	case parensClose
@@ -76,8 +77,4 @@ public enum TokenType {
 		return "\(self)"
 	}
 	
-}
-
-func ==(lhs: TokenType, rhs: TokenType) -> Bool {
-	return lhs.uniqueDescription == rhs.uniqueDescription
 }

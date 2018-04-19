@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Token: CustomStringConvertible {
+public struct Token: CustomStringConvertible, Equatable {
 
 	/// The token's type
 	public let type: TokenType

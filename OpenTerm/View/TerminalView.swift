@@ -32,8 +32,66 @@ class TerminalView: UIView {
 	var stderrParser = Parser()
 	var currentCommandStartIndex: String.Index! {
 		didSet {
-			self.updateAutoComplete()
+			updateAutoComplete()
+			updateCompletion()
 		}
+	}
+	
+	func updateCompletion() {
+		
+		guard let completion = self.autoCompleteManager.completions.first, currentCommand != "" else {
+			
+			if let description = CommandManager.shared.description(for: currentCommand), !description.isEmpty {
+				textView.autoCompletion = " (\(description))"
+			} else {
+				textView.autoCompletion = ""
+			}
+			
+			return
+		}
+		
+		let completionString: String
+		
+		switch autoCompleteManager.state {
+		case .executing:
+			completionString = ""
+			
+		default:
+			// Two options:
+			// - There is a space at the end => insert full word
+			// - Complete current word
+			
+			let currentCommand = self.currentCommand
+			if currentCommand.hasSuffix(" ") || currentCommand.hasSuffix("/") {
+				// This will be a new argument, or append to the end of a path. Just insert the text.
+				completionString = completion.name
+
+			} else {
+				// We need to complete the current argument
+				var components = currentCommand.components(separatedBy: .whitespaces)
+				if let lastComponent = components.popLast() {
+					// If the argument we are completing is a path, we must only replace the last part of the path
+					if lastComponent.contains("/") {
+						components.append(((lastComponent as NSString).deletingLastPathComponent as NSString).appendingPathComponent(completion.name))
+					} else {
+						components.append(completion.name)
+					}
+				}
+				
+				var str = String(components.joined(separator: " ").dropFirst(currentCommand.count))
+				
+				if let description = CommandManager.shared.description(for: completion.name), !description.isEmpty {
+					str += " (\(description))"
+				}
+				
+				completionString = str
+				
+			}
+			
+		}
+		
+		textView.autoCompletion = completionString
+		
 	}
 	
 	var columnWidth: Int {
@@ -52,6 +110,9 @@ class TerminalView: UIView {
 		// Assumes the font is monospaced
 		return Int(viewWidth / charWidth)
 	}
+
+	var didEnterInput: ((String) -> Void)?
+	var subCommandParserDidEndTransmissionCallback: (() -> Void)?
 
 	weak var delegate: TerminalViewDelegate?
 
@@ -102,6 +163,8 @@ class TerminalView: UIView {
 		keyboardObserver.observe { [weak self] (state) in
 			self?.adjustInsets(for: state)
 		}
+		
+		updateCompletion()
 
 	}
 	
@@ -143,9 +206,14 @@ class TerminalView: UIView {
 	}
 
 	func appendText(_ text: NSAttributedString) {
+		
+		if text.string.isEmpty {
+			return
+		}
+		
 		dispatchPrecondition(condition: .onQueue(.main))
 
-		let text = NSMutableAttributedString.init(attributedString: text)
+		let text = NSMutableAttributedString(attributedString: text)
 		OutputSanitizer.sanitize(text.mutableString)
 
 		let new = NSMutableAttributedString(attributedString: textView.attributedText ?? NSAttributedString())
@@ -158,7 +226,8 @@ class TerminalView: UIView {
 		self.textView.isScrollEnabled = true
 	}
 	
-	private func appendText(_ text: String) {
+	func appendText(_ text: String) {
+
 		dispatchPrecondition(condition: .onQueue(.main))
 
 		appendText(NSAttributedString(string: text, attributes: [.foregroundColor: textView.textColor ?? .black, .font: textView.font!]))
@@ -207,6 +276,15 @@ class TerminalView: UIView {
 		return textView.becomeFirstResponder()
 	}
 
+	@discardableResult
+	override func resignFirstResponder() -> Bool {
+		return textView.resignFirstResponder()
+	}
+	
+	override var canBecomeFirstResponder: Bool {
+		return textView.canBecomeFirstResponder
+	}
+	
 	var currentCommand: String {
 		get {
 
@@ -304,6 +382,12 @@ extension TerminalView {
 extension TerminalView: ParserDelegate {
 
 	func parserDidEndTransmission(_ parser: Parser) {
+
+		if let callback = subCommandParserDidEndTransmissionCallback {
+			callback()
+			return
+		}
+		
 		DispatchQueue.main.async {
 			self.writePrompt()
 		}
@@ -335,6 +419,27 @@ extension TerminalView: CommandExecutorDelegate {
 			self.updateAutoComplete()
 		}
 	}
+	
+	func commandExecutor(_ commandExecutor: CommandExecutor, waitForInput callback: @escaping (String) -> Void) {
+	
+		didEnterInput = callback
+		currentCommandStartIndex = textView.text.endIndex
+		executor.state = .waitingForInput
+		
+	}
+	
+	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, callback: @escaping () -> Void) {
+		
+		subCommandParserDidEndTransmissionCallback = { [weak self] in
+			
+			self?.subCommandParserDidEndTransmissionCallback = nil
+			callback()
+		}
+		
+		commandExecutor.dispatch(subCommand)
+		
+	}
+	
 }
 
 extension TerminalView: UITextDragDelegate {
@@ -364,6 +469,13 @@ extension TerminalView: UITextViewDelegate {
 		//		}
 		//
 	}
+	
+	func waitForInput() {
+		
+		currentCommandStartIndex = textView.text.endIndex
+		executor.state = .waitingForInput
+		
+	}
 
 	func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
 
@@ -392,11 +504,29 @@ extension TerminalView: UITextViewDelegate {
 			}
 
 			return true
+			
+		case .waitingForInput:
+			
+			if text == "\n" {
+			
+				self.executor.state = .running
+				
+				let input = textView.text[currentCommandStartIndex..<textView.text.endIndex]
+				
+				newLine()
+				didEnterInput?(String(input))
+				
+				return false
+			}
+			
+			return true
 		}
+		
 	}
 
 	func textViewDidChange(_ textView: UITextView) {
 		updateAutoComplete()
+		updateCompletion()
 	}
 
 }

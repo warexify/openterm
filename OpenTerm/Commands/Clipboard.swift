@@ -19,7 +19,9 @@ public func pbcopy(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer<
 	while true {
 		var byte: Int8 = 0
 		let count = read(fileno(thread_stdin), &byte, 1)
-		guard count == 1 else { break }
+		guard count == 1 else {
+			break
+		}
 		bytes.append(byte)
 	}
 
@@ -29,6 +31,10 @@ public func pbcopy(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer<
 		return 1
 	}
 	
-	UIPasteboard.general.string = String(data: data, encoding: .utf8)
+	guard let string = String(data: data, encoding: .utf8) else {
+		return 1
+	}
+	
+	UIPasteboard.general.string = string
 	return 0
 }
