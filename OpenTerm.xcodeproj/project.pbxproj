@@ -125,7 +125,6 @@
 		3CE57681202A52ED00760E43 /* TerminalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3808571FD9BFB600393EB8 /* TerminalViewController.swift */; };
 		3CE5769E202A7EC500760E43 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE5769D202A7EC500760E43 /* Parser.swift */; };
 		3CE576A0202A874C00760E43 /* OutputSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE5769F202A874C00760E43 /* OutputSanitizer.swift */; };
-		AEF20A4A223775F9F5101BF5 /* Pods_OpenTerm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 064CE91D25CE0DA967737711 /* Pods_OpenTerm.framework */; };
 		BE0146EB2083B2F90072AAB5 /* ManualWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0146EA2083B2F90072AAB5 /* ManualWebViewController.swift */; };
 		BE0146ED2083BA000072AAB5 /* cub-guide.htmlcontainer in Resources */ = {isa = PBXBuildFile; fileRef = BE0146EC2083BA000072AAB5 /* cub-guide.htmlcontainer */; };
 		BE102815207A372C005E965F /* String+C.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE102814207A372C005E965F /* String+C.swift */; };
@@ -374,6 +373,9 @@
 		225F9266207659E900632A88 /* libclangStaticAnalyzerCheckers.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclangStaticAnalyzerCheckers.dylib; path = ../llvm/build_ios/lib/libclangStaticAnalyzerCheckers.dylib; sourceTree = "<group>"; };
 		225F926820765A0800632A88 /* libclangASTMatchers.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclangASTMatchers.dylib; path = ../llvm/build_ios/lib/libclangASTMatchers.dylib; sourceTree = "<group>"; };
 		225F926A20765A5A00632A88 /* libclangStaticAnalyzerCore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclangStaticAnalyzerCore.dylib; path = ../llvm/build_ios/lib/libclangStaticAnalyzerCore.dylib; sourceTree = "<group>"; };
+		228B2346208A97350009A7C3 /* libc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libc.tbd; path = usr/lib/libc.tbd; sourceTree = SDKROOT; };
+		228B2348208A97400009A7C3 /* libSystem.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.tbd; path = usr/lib/libSystem.tbd; sourceTree = SDKROOT; };
+		228B234B208A98230009A7C3 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		22A36F05208775D3008B8F92 /* llvm-nm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "llvm-nm"; path = "../llvm/build_ios/bin/llvm-nm"; sourceTree = "<group>"; };
 		22A36F0720877D2C008B8F92 /* llvm-dis */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "llvm-dis"; path = "../llvm/build_ios/bin/llvm-dis"; sourceTree = "<group>"; };
 		22A36F0920877DD7008B8F92 /* llvm-link */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "llvm-link"; path = "../llvm/build_ios/bin/llvm-link"; sourceTree = "<group>"; };
@@ -754,6 +756,9 @@
 		BE3768EC1FEC4DCE00D5A2D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				228B234B208A98230009A7C3 /* libSystem.B.tbd */,
+				228B2348208A97400009A7C3 /* libSystem.tbd */,
+				228B2346208A97350009A7C3 /* libc.tbd */,
 				22B41D28206AE85000FC2BF0 /* libbibtex.dylib */,
 				22B41D26206AE85000FC2BF0 /* libctags.dylib */,
 				22B41D24206AE84F00FC2BF0 /* libkpathsea.6.dylib */,
@@ -1299,6 +1304,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenTerm/OpenTerm.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VG8Z23C8YL;
@@ -1329,6 +1335,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenTerm/OpenTerm.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VG8Z23C8YL;
