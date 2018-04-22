@@ -10,6 +10,8 @@ import Foundation
 
 public class Parser {
 
+	private var potentialDocNodes = [CommentNode]()
+	
 	private let tokens: [Token]
 
 	/// Token index
@@ -17,13 +19,7 @@ public class Parser {
 
 	public init(tokens: [Token]) {
 
-		self.tokens = tokens.filter {
-			if case .comment = $0.type {
-				return false
-			}
-
-			return true
-		}
+		self.tokens = tokens
 
 	}
 
@@ -263,7 +259,7 @@ public class Parser {
 			throw error(.unexpectedToken)
 		}
 
-		guard let assignmentNode = try parseVariable(with: varName) as? AssignmentNode else {
+		guard let assignmentNode = try parseVariable(with: varName, identifierToken: currentToken) as? AssignmentNode else {
 			throw self.error(.unexpectedToken)
 		}
 
@@ -315,7 +311,7 @@ public class Parser {
 			
 			do {
 				
-				let assign = try AssignmentNode(variable: node, value: expr, range: currentToken.range)
+				let assign = try AssignmentNode(variable: node, value: expr, range: currentToken.range, documentation: nil)
 				return assign
 				
 			} catch let error as AssignmentNodeValidationError {
@@ -349,7 +345,7 @@ public class Parser {
 				throw self.error(.illegalBinaryOperation, token: currentToken)
 			}
 
-			let assignment = try AssignmentNode(variable: node, value: operation, range: currentToken.range)
+			let assignment = try AssignmentNode(variable: node, value: operation, range: currentToken.range, documentation: nil)
 
 			return assignment
 
@@ -411,8 +407,16 @@ public class Parser {
 
 	}
 
-	private func parseVariable(with name: String) throws -> ASTNode {
+	private func parseVariable(with name: String, identifierToken: Token) throws -> ASTNode {
 
+		var documentation: String? = nil
+		
+		if !potentialDocNodes.isEmpty, let funcTokenRange = identifierToken.range {
+			documentation = getDocumentation(for: funcTokenRange)
+		}
+		
+		potentialDocNodes = []
+		
 		let varNode = VariableNode(name: name, range: currentTokenRange())
 
 		if let currentToken = peekCurrentToken(), case .equals = currentToken.type {
@@ -427,7 +431,7 @@ public class Parser {
 			
 			do {
 				
-				let assign = try AssignmentNode(variable: varNode, value: binaryOp, range: currentToken.range)
+				let assign = try AssignmentNode(variable: varNode, value: binaryOp, range: currentToken.range, documentation: documentation)
 				return assign
 				
 			} catch let error as AssignmentNodeValidationError {
@@ -543,7 +547,7 @@ public class Parser {
 		}
 
 		guard let currentToken = peekCurrentToken(), case .parensOpen = currentToken.type else {
-			return try parseVariable(with: name)
+			return try parseVariable(with: name, identifierToken: idToken)
 		}
 
 		popCurrentToken()
@@ -585,6 +589,18 @@ public class Parser {
 
 		guard let currentToken = peekCurrentToken() else {
 			throw error(.unexpectedToken)
+		}
+		
+		if case .comment = currentToken.type {
+			
+		} else if case .function = currentToken.type {
+
+		} else if case .identifier = currentToken.type {
+
+		} else if case .struct = currentToken.type {
+
+		} else {
+			potentialDocNodes = []
 		}
 
 		switch currentToken.type {
@@ -639,10 +655,26 @@ public class Parser {
 			case .struct:
 				return try parseStruct()
 
+			case .comment:
+				return try parseComment()
+			
 			default:
 				throw error(.expectedExpression, token: currentToken)
 		}
 
+	}
+	
+	private func parseComment() throws -> CommentNode {
+		
+		guard let token = popCurrentToken(), case let .comment(commentString) = token.type else {
+			throw error(.internalInconsistencyOccurred, token: nil)
+		}
+		
+		let node = CommentNode(comment: commentString, range: token.range)
+		
+		potentialDocNodes.append(node)
+		
+		return node
 	}
 
 	private func parseContinue() throws -> ContinueNode {
@@ -992,18 +1024,60 @@ public class Parser {
 
 		return FunctionPrototypeNode(name: name, argumentNames: argumentNames, returns: returns, range: idToken.range)
 	}
+	
+	private func getDocumentation(for range: Range<Int>) -> String? {
+		
+		var docNodes = [CommentNode]()
+		
+		var currentLowerboundCheck = range.lowerBound
+		
+		for docCommentNode in potentialDocNodes.reversed() {
+			
+			guard docCommentNode.comment.hasPrefix("///") else {
+				break
+			}
+			
+			guard let range = docCommentNode.range else {
+				continue
+			}
+			
+			// +1 for new line
+			guard range.upperBound + 1 == currentLowerboundCheck else {
+				break
+			}
+			
+			docNodes.insert(docCommentNode, at: 0)
+			currentLowerboundCheck = range.lowerBound
+			
+		}
+		
+		if !docNodes.isEmpty {
+			return docNodes.map({ $0.comment }).joined(separator: "\n")
+		} else {
+			return nil
+		}
+		
+	}
 
 	private func parseFunction() throws -> FunctionNode {
 
-		try popCurrentToken(andExpect: .function)
+		let funcToken = try popCurrentToken(andExpect: .function)
+		
+		var documentation: String? = nil
+		
+		if !potentialDocNodes.isEmpty, let funcTokenRange = funcToken.range {
+			documentation = getDocumentation(for: funcTokenRange)
+		}
+		
+		potentialDocNodes = []
 
 		let prototype = try parseFunctionPrototype()
 
 		let body = try parseBody()
 
 		try popCurrentToken(andExpect: .curlyClose, "}")
-
-		return FunctionNode(prototype: prototype, body: body, range: currentTokenRange())
+			
+		return FunctionNode(prototype: prototype, body: body, range: currentTokenRange(), documentation: documentation)
 	}
 
 	private func parseArray() throws -> ArrayNode {
@@ -1045,7 +1119,15 @@ public class Parser {
 	
 	private func parseStruct() throws -> StructNode {
 
-		try popCurrentToken(andExpect: .struct)
+		let structToken = try popCurrentToken(andExpect: .struct)
+		
+		var documentation: String? = nil
+		
+		if !potentialDocNodes.isEmpty, let structTokenRange = structToken.range {
+			documentation = getDocumentation(for: structTokenRange)
+		}
+		
+		potentialDocNodes = []
 
 		guard let idToken = popCurrentToken() else {
 			throw error(.expectedFunctionName)
@@ -1080,7 +1162,7 @@ public class Parser {
 
 		try popCurrentToken(andExpect: .curlyClose, "}")
 
-		return StructNode(prototype: prototype, range: idToken.range)
+		return StructNode(prototype: prototype, range: idToken.range, documentation: documentation)
 	}
 
 	// MARK: -

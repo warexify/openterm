@@ -15,7 +15,7 @@ extension Runner {
 		
 		let runner = Runner(logDebug: false, logTime: false)
 		
-		runner.registerExternalFunction(name: "print", argumentNames: ["input"], returns: true) { (arguments, callback) in
+		runner.registerExternalFunction(documentation: nil, name: "print", argumentNames: ["input"], returns: true) { (arguments, callback) in
 			
 			for (_, arg) in arguments {
 				
@@ -27,12 +27,12 @@ extension Runner {
 				}
 			}
 			
-			Thread.sleep(forTimeInterval: 0.02)
+			Thread.sleep(forTimeInterval: 0.01)
 			_ = callback(.number(1))
 			return
 		}
 		
-		runner.registerExternalFunction(name: "readNumber", argumentNames: [], returns: true) { (arguments, callback) in
+		runner.registerExternalFunction(documentation: nil, name: "readNumber", argumentNames: [], returns: true) { (arguments, callback) in
 			
 			executorDelegate.commandExecutor(executor, waitForInput: { (input) in
 				
@@ -47,7 +47,7 @@ extension Runner {
 			return
 		}
 		
-		runner.registerExternalFunction(name: "readLine", argumentNames: [], returns: true) { (arguments, callback) in
+		runner.registerExternalFunction(documentation: nil, name: "readLine", argumentNames: [], returns: true) { (arguments, callback) in
 			
 			executorDelegate.commandExecutor(executor, waitForInput: { (input) in
 				_ = callback(.string(input))
@@ -56,7 +56,13 @@ extension Runner {
 			return
 		}
 		
-		runner.registerExternalFunction(name: "exec", argumentNames: ["command"], returns: true) { (arguments, callback) in
+		let shellCommand = """
+						Execute a shell command in the shell that the script is executed from.
+						- Parameter command: The command to execute.
+						- Returns: the exit code, 0 means no error.
+						"""
+		
+		runner.registerExternalFunction(documentation: shellCommand, name: "shell", argumentNames: ["command"], returns: true) { (arguments, callback) in
 			
 			var arguments = arguments
 			
