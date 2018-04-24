@@ -17,6 +17,7 @@ protocol ScriptMetadataViewControllerDelegate: class {
 	
 	func didUpdateScript(_ updatedDocument: PridelandDocument)
 	func didCreateScript(_ document: PridelandDocument)
+	func didDeleteScript()
 	
 }
 
@@ -28,6 +29,7 @@ class ScriptMetadataViewController: UIViewController {
 	@IBOutlet weak var saveBarButtonItem: UIBarButtonItem!
 	@IBOutlet weak var colorBarPicker: CustomColorBarPicker!
 	@IBOutlet weak var nameErrorLbl: UILabel!
+	@IBOutlet weak var deleteBarButtonItem: UIBarButtonItem!
 	
 	weak var delegate: ScriptMetadataViewControllerDelegate?
 	
@@ -57,6 +59,7 @@ class ScriptMetadataViewController: UIViewController {
 		case .create:
 			self.title = "New script"
 			saveBarButtonItem.title = "Create"
+			self.navigationItem.rightBarButtonItems = [saveBarButtonItem]
 			
 		case .update(let document):
 			
@@ -70,6 +73,9 @@ class ScriptMetadataViewController: UIViewController {
 			nameTextField.text = document.metadata?.name ?? ""
 			descriptionTextView.text = document.metadata?.description ?? ""
 			colorBarPicker.hue = CGFloat(document.metadata?.hueTint ?? 0.0)
+			deleteBarButtonItem.title = "Delete"
+			deleteBarButtonItem.isEnabled = true
+			deleteBarButtonItem.tintColor = .defaultMainTintColor
 			
 		}
 		
@@ -132,6 +138,35 @@ class ScriptMetadataViewController: UIViewController {
 		self.dismiss(animated: true, completion: nil)
 		
 	}
+	
+    @IBAction func deletePrideland(_ sender: UIBarButtonItem) {
+        
+        let metadata = self.metadata()
+        
+        let url = DocumentManager.shared.scriptsURL.appendingPathComponent("\(metadata.name).prideland")
+		
+		let deleteAlert = UIAlertController(title: "Are you sure you want to delete “\(metadata.name)”?", message: "This action can't be undone.", preferredStyle: .alert)
+		
+		deleteAlert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { (handler) in
+			
+			do {
+				try DocumentManager.shared.fileManager.removeItem(at: url)
+				
+				self.dismiss(animated: true, completion: {
+					self.delegate?.didDeleteScript()
+				})
+				
+			} catch {
+				self.showErrorAlert(error)
+			}
+			
+		}))
+		
+		deleteAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		
+		self.present(deleteAlert, animated: true, completion: nil)
+		
+    }
 	
 	@IBAction func save(_ sender: UIBarButtonItem) {
 		
