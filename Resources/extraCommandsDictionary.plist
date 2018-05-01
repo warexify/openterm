@@ -9,6 +9,13 @@
 		<string></string>
 		<string>file</string>
 	</array>
+	<key>opt</key>
+	<array>
+		<string>opt</string>
+		<string>main</string>
+		<string></string>
+		<string>file</string>
+	</array>
 	<key>llvm-link</key>
 	<array>
 		<string>llvm-link</string>
