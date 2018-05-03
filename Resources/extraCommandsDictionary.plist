@@ -4,7 +4,7 @@
 <dict>
 	<key>llvm-dis</key>
 	<array>
-		<string>llvm-dis</string>
+		<string>dis.framework/dis</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
@@ -18,7 +18,7 @@
 	</array>
 	<key>llvm-link</key>
 	<array>
-		<string>llvm-link</string>
+		<string>link.framework/link</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
