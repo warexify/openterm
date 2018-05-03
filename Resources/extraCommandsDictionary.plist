@@ -11,7 +11,7 @@
 	</array>
 	<key>opt</key>
 	<array>
-		<string>opt</string>
+		<string>opt.framework/opt</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
@@ -25,28 +25,28 @@
 	</array>
 	<key>nm</key>
 	<array>
-		<string>llvm-nm</string>
+		<string>nm.framework/nm</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
 	</array>
 	<key>lli</key>
 	<array>
-		<string>lli</string>
+		<string>lli.framework/lli</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
 	</array>
 	<key>clang</key>
 	<array>
-		<string>clang-7</string>
+		<string>clang.framework/clang</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
 	</array>
 	<key>clang++</key>
 	<array>
-		<string>clang-7</string>
+		<string>clang.framework/clang</string>
 		<string>main</string>
 		<string></string>
 		<string>file</string>
