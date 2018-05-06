@@ -31,7 +31,6 @@
 		22B41D2A206AE89B00FC2BF0 /* libctags.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D26206AE85000FC2BF0 /* libctags.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D2B206AE89B00FC2BF0 /* libkpathsea.6.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D24206AE84F00FC2BF0 /* libkpathsea.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D2C206AE89B00FC2BF0 /* libluatex.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D23206AE84E00FC2BF0 /* libluatex.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		22B41D2D206AE89B00FC2BF0 /* libnetwork_ios.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D27206AE85000FC2BF0 /* libnetwork_ios.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D2E206AE89B00FC2BF0 /* libpdftex.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D25206AE84F00FC2BF0 /* libpdftex.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D36206AE8F100FC2BF0 /* libtexlua52.5.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D35206AE8C500FC2BF0 /* libtexlua52.5.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D39206AE9A800FC2BF0 /* lua_ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D37206AE9A700FC2BF0 /* lua_ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -160,7 +159,6 @@
 				22B41D2A206AE89B00FC2BF0 /* libctags.dylib in Embed Frameworks */,
 				22B41D2B206AE89B00FC2BF0 /* libkpathsea.6.dylib in Embed Frameworks */,
 				22B41D2C206AE89B00FC2BF0 /* libluatex.dylib in Embed Frameworks */,
-				22B41D2D206AE89B00FC2BF0 /* libnetwork_ios.dylib in Embed Frameworks */,
 				22B41D2E206AE89B00FC2BF0 /* libpdftex.dylib in Embed Frameworks */,
 				22B41D36206AE8F100FC2BF0 /* libtexlua52.5.dylib in Embed Frameworks */,
 			);
