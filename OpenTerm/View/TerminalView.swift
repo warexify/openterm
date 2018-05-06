@@ -358,24 +358,13 @@ extension TerminalView {
 	}
 
 	@objc func completeCommand() {
+
 		guard
-			let firstCompletion = autoCompleteManager.completions.first?.name,
-			currentCommand != firstCompletion
+			let firstCompletion = autoCompleteManager.completions.first,
+			currentCommand != firstCompletion.name
 			else { return }
 
-		let completed: String
-		if let lastCommand = currentCommand.components(separatedBy: " ").last {
-			if lastCommand.isEmpty {
-				completed = currentCommand + firstCompletion
-			} else {
-				completed = currentCommand.replacingOccurrences(of: lastCommand, with: firstCompletion, options: .backwards)
-			}
-		} else {
-			completed = firstCompletion
-		}
-
-		currentCommand = completed
-		autoCompleteManager.reloadData()
+		insertCompletion(firstCompletion)
 	}
 }
 
