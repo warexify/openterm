@@ -51,6 +51,20 @@
 		<string></string>
 		<string>file</string>
 	</array>
+	<key>swift</key>
+	<array>
+		<string>swift</string>
+		<string>main</string>
+		<string></string>
+		<string>file</string>
+	</array>
+	<key>swiftc</key>
+	<array>
+		<string>swift</string>
+		<string>main</string>
+		<string></string>
+		<string>file</string>
+	</array>
 	<key>ctags</key>
 	<array>
 		<string>libctags.dylib</string>
@@ -148,13 +162,6 @@
 		<string>dllpdftexmain</string>
 		<string></string>
 		<string>file</string>
-	</array>
-	<key>groups</key>
-	<array>
-		<string>shell.framework/shell</string>
-		<string>id_main</string>
-		<string></string>
-		<string>no</string>
 	</array>
 	<key>id</key>
 	<array>
