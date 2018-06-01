@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1C81BE5720225C3800D07301 /* Clipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C81BE5620225C3800D07301 /* Clipboard.swift */; };
+		2200D94420A4BAE7002BD4E4 /* swift in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2200D94320A4BADB002BD4E4 /* swift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		2210C55D2068000500967503 /* files.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A949552067FEFA003A0666 /* files.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2210C55E2068000A00967503 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A949562067FEFB003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22287E70206983480031C57D /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494E2067FE65003A0666 /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -35,6 +36,10 @@
 		22B41D36206AE8F100FC2BF0 /* libtexlua52.5.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D35206AE8C500FC2BF0 /* libtexlua52.5.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22B41D39206AE9A800FC2BF0 /* lua_ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D37206AE9A700FC2BF0 /* lua_ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22B41D3A206AE9A800FC2BF0 /* Python_ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22B41D38206AE9A800FC2BF0 /* Python_ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22D2FC3D20B1565D003DF7C2 /* libc++abi.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D2FC3C20B15652003DF7C2 /* libc++abi.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		22D2FC3E20B1565D003DF7C2 /* libc++.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D2FC3B20B15649003DF7C2 /* libc++.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		22F9512D20AD5F7E006268D5 /* libswiftCore_mine.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F9512C20AD5F7B006268D5 /* libswiftCore_mine.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		22F9512E20AD5F80006268D5 /* libswiftSwiftOnoneSupport_mine.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F9512B20AD5F7B006268D5 /* libswiftSwiftOnoneSupport_mine.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		28CDA426202444CC0055206D /* BookmarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CDA425202444CC0055206D /* BookmarkViewController.swift */; };
 		28CDA4292024B3510055206D /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CDA4282024B3510055206D /* BookmarkManager.swift */; };
 		3C1A47B02031357500D7CC5C /* ios_system.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE3768EE1FEC4DCE00D5A2D1 /* ios_system.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -131,7 +136,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		BE000C0B1FEC4F7000D06B91 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
@@ -148,6 +153,11 @@
 				22287E89206983A30031C57D /* curl_ios.framework in Embed Frameworks */,
 				22287E70206983480031C57D /* libssh2.framework in Embed Frameworks */,
 				22287E71206983480031C57D /* openssl.framework in Embed Frameworks */,
+				22D2FC3D20B1565D003DF7C2 /* libc++abi.1.dylib in Embed Frameworks */,
+				22D2FC3E20B1565D003DF7C2 /* libc++.1.dylib in Embed Frameworks */,
+				2200D94420A4BAE7002BD4E4 /* swift in Embed Frameworks */,
+				22F9512D20AD5F7E006268D5 /* libswiftCore_mine.dylib in Embed Frameworks */,
+				22F9512E20AD5F80006268D5 /* libswiftSwiftOnoneSupport_mine.dylib in Embed Frameworks */,
 				22379432209B504C00B15016 /* link.framework in Embed Frameworks */,
 				22379433209B504C00B15016 /* dis.framework in Embed Frameworks */,
 				22379434209B504C00B15016 /* nm.framework in Embed Frameworks */,
@@ -171,6 +181,7 @@
 		064CE91D25CE0DA967737711 /* Pods_OpenTerm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenTerm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B49C6C42402049931D1ABDB /* Pods-OpenTerm.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenTerm.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenTerm/Pods-OpenTerm.debug.xcconfig"; sourceTree = "<group>"; };
 		1C81BE5620225C3800D07301 /* Clipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clipboard.swift; sourceTree = "<group>"; };
+		2200D94320A4BADB002BD4E4 /* swift */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = swift; path = "../swift_sources/build/Ninja-ReleaseAssert/swift-iphoneos-arm64/bin/swift"; sourceTree = "<group>"; };
 		22287E7E206983800031C57D /* text.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = text.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		22287E7F206983800031C57D /* shell.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = shell.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		22287E80206983810031C57D /* network_ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = network_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -202,6 +213,15 @@
 		22B41D35206AE8C500FC2BF0 /* libtexlua52.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtexlua52.5.dylib; path = ../ios_system/release/libtexlua52.5.dylib; sourceTree = "<group>"; };
 		22B41D37206AE9A700FC2BF0 /* lua_ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = lua_ios.framework; path = ../ios_system/release/lua_ios.framework; sourceTree = "<group>"; };
 		22B41D38206AE9A800FC2BF0 /* Python_ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python_ios.framework; path = ../ios_system/release/Python_ios.framework; sourceTree = "<group>"; };
+		22C1D2EB20A8C14C0093127F /* libobjc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.tbd; path = usr/lib/libobjc.tbd; sourceTree = SDKROOT; };
+		22C1D2ED20A8C1530093127F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		22C1D2EF20A8C1590093127F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		22D2FC3B20B15649003DF7C2 /* libc++.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.1.dylib"; path = "../llvm/frameworks/libc++.1.dylib"; sourceTree = "<group>"; };
+		22D2FC3C20B15652003DF7C2 /* libc++abi.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++abi.1.dylib"; path = "../llvm/frameworks/libc++abi.1.dylib"; sourceTree = "<group>"; };
+		22F9512B20AD5F7B006268D5 /* libswiftSwiftOnoneSupport_mine.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftSwiftOnoneSupport_mine.dylib; path = "../swift_sources/build/Ninja-ReleaseAssert/swift-iphoneos-arm64/lib/swift/iphoneos/arm64/libswiftSwiftOnoneSupport_mine.dylib"; sourceTree = "<group>"; };
+		22F9512C20AD5F7B006268D5 /* libswiftCore_mine.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftCore_mine.dylib; path = "../swift_sources/build/Ninja-ReleaseAssert/swift-iphoneos-arm64/lib/swift/iphoneos/arm64/libswiftCore_mine.dylib"; sourceTree = "<group>"; };
+		22F9513420AF289B006268D5 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		22F9513620AF66BC006268D5 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		28CDA425202444CC0055206D /* BookmarkViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkViewController.swift; sourceTree = "<group>"; };
 		28CDA4282024B3510055206D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		3C2E4373201EF67C00E4254A /* TerminalView+AutoComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalView+AutoComplete.swift"; sourceTree = "<group>"; };
@@ -312,6 +332,11 @@
 		22A36F04208775A4008B8F92 /* llvm-clang */ = {
 			isa = PBXGroup;
 			children = (
+				22D2FC3C20B15652003DF7C2 /* libc++abi.1.dylib */,
+				22D2FC3B20B15649003DF7C2 /* libc++.1.dylib */,
+				2200D94320A4BADB002BD4E4 /* swift */,
+				22F9512C20AD5F7B006268D5 /* libswiftCore_mine.dylib */,
+				22F9512B20AD5F7B006268D5 /* libswiftSwiftOnoneSupport_mine.dylib */,
 				22379431209B502D00B15016 /* link.framework */,
 				2237941E209B4EEB00B15016 /* dis.framework */,
 				2237940A209B2CA300B15016 /* nm.framework */,
@@ -483,6 +508,11 @@
 		BE3768EC1FEC4DCE00D5A2D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22F9513620AF66BC006268D5 /* libstdc++.tbd */,
+				22F9513420AF289B006268D5 /* libc++.tbd */,
+				22C1D2EF20A8C1590093127F /* Foundation.framework */,
+				22C1D2ED20A8C1530093127F /* CoreFoundation.framework */,
+				22C1D2EB20A8C14C0093127F /* libobjc.tbd */,
 				228B234B208A98230009A7C3 /* libSystem.B.tbd */,
 				228B2348208A97400009A7C3 /* libSystem.tbd */,
 				228B2346208A97350009A7C3 /* libc.tbd */,
@@ -1056,11 +1086,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0B49C6C42402049931D1ABDB /* Pods-OpenTerm.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenTerm/OpenTerm.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = VG8Z23C8YL;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1078,7 +1110,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Nicolas-Holzschuch-OpenTerm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				STRIP_STYLE = "non-global";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1088,11 +1122,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FDC5C7C341371B47A1DB68A2 /* Pods-OpenTerm.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenTerm/OpenTerm.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = VG8Z23C8YL;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1110,7 +1146,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Nicolas-Holzschuch-OpenTerm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				STRIP_STYLE = "non-global";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
