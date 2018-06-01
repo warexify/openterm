@@ -44,6 +44,8 @@ class TerminalViewController: UIViewController {
 		}
 	}
 
+	var overflowItem: UIBarButtonItem!
+
 	init() {
 		terminalView = TerminalView()
 		contentWrapperView = UIView()
@@ -95,6 +97,8 @@ class TerminalViewController: UIViewController {
 		historyViewController.delegate = self
 		bookmarkViewController.delegate = self
 		terminalView.delegate = self
+		
+		overflowItem = UIBarButtonItem(image: #imageLiteral(resourceName: "More"), style: .plain, target: self, action: #selector(showOverflowMenu(_:)))
 	}
 
 	required init?(coder aDecoder: NSCoder) {
@@ -219,6 +223,13 @@ class TerminalViewController: UIViewController {
 			}
 
 			let certsFolderURL = DocumentManager.shared.activeDocumentsFolderURL.appendingPathComponent(".certs")
+
+			let iCloudURL = certsFolderURL.appendingPathComponent("cacert.pem.icloud")
+			
+			if fileManager.fileExists(atPath: iCloudURL.path) {
+				try? fileManager.startDownloadingUbiquitousItem(at: iCloudURL)
+				return
+			}
 
 			let newURL = certsFolderURL.appendingPathComponent("cacert.pem")
 
@@ -578,13 +589,14 @@ private extension TerminalViewController {
 	}
 
 	func applyOverflowState() {
-		let overflowItem = UIBarButtonItem(image: #imageLiteral(resourceName: "More"), style: .plain, target: self, action: #selector(showOverflowMenu(_:)))
 		switch self.overflowState {
 		case .expanded:
 			let visibleItems = overflowItems.filter { $0.visibleInBar }.map { OverflowBarButtonItem(item: $0) }
 			self.navigationItem.rightBarButtonItems = visibleItems + (visibleItems.count != overflowItems.count ? [overflowItem] : [])
 		case .compact:
-			self.navigationItem.rightBarButtonItems = [overflowItem]
+			if self.navigationItem.rightBarButtonItems != [overflowItem] {
+				self.navigationItem.rightBarButtonItems = [overflowItem]
+			}
 		}
 	}
 
@@ -627,6 +639,7 @@ private extension TerminalViewController {
 		override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 			return items.count
 		}
+		
 		override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 			let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
@@ -636,13 +649,15 @@ private extension TerminalViewController {
 			cell.imageView?.backgroundColor = .darkGray
 			cell.imageView?.layer.cornerRadius = 5
 			cell.backgroundColor = .clear
-			cell.selectionStyle = .none
+			cell.selectionStyle = .default
 
 			return cell
 		}
 
 		override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 			tableView.deselectRow(at: indexPath, animated: true)
+
+			tableView.cellForRow(at: indexPath)?.imageView?.backgroundColor = .darkGray
 
 			// Get the view that presented this popover
 			guard let presentingView = popoverPresentationController?.sourceView else { return }
@@ -655,11 +670,7 @@ private extension TerminalViewController {
 		}
 
 		override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
-			tableView.cellForRow(at: indexPath)?.backgroundColor = UIColor.black.withAlphaComponent(0.1)
-		}
-
-		override func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
-			tableView.cellForRow(at: indexPath)?.backgroundColor = .clear
+			tableView.cellForRow(at: indexPath)?.imageView?.backgroundColor = .darkGray
 		}
 
 		// Always show in popover, even on iPhone

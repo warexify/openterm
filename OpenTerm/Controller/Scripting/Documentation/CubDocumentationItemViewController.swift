@@ -19,119 +19,153 @@ class CubDocumentationItemViewController: UIViewController {
         super.viewDidLoad()
 
 		self.title = item.title
-		textView.attributedText = attributedString(item: item)
-		textView.isEditable = false
+		self.textView.attributedText = attributedString(item: item)
+		self.textView.isEditable = false
 		
 		self.navigationController?.navigationBar.barStyle = .blackTranslucent
 		self.view.backgroundColor = .panelBackgroundColor
 		self.textView.backgroundColor = .panelBackgroundColor
 		self.textView.textColor = .white
+		self.textView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+		self.textView.indicatorStyle = .white
 		
     }
 	
 	func attributedString(item: DocumentationItem) -> NSAttributedString {
 		
 		let font = UIFont.systemFont(ofSize: 17.0)
+		let boldFont = UIFont.boldSystemFont(ofSize: 17.0)
+
+		let titleFont = UIFont.systemFont(ofSize: 22, weight: .medium)
+
+		let paragraphStyle = NSMutableParagraphStyle()
+		paragraphStyle.paragraphSpacingBefore = 16
+		paragraphStyle.paragraphSpacing = 8
+
+		let titleAttributes: [NSAttributedStringKey: Any] = [.foregroundColor: UIColor.white,
+															 .font: titleFont,
+															 .paragraphStyle: paragraphStyle]
 		
 		let attributedString = NSMutableAttributedString(string: "", attributes: [.foregroundColor: UIColor.white, .font: font])
 		
-		let definitionAttrString = NSAttributedString(string: item.definition + "\n\n", attributes: [.font: UIFont(name: "Menlo-Regular", size: 17.0)!])
+		let definitionAttrString = NSAttributedString(string: item.definition + "\n", attributes: [.font: UIFont(name: "Menlo-Regular", size: 17.0)!])
 		
+		let declarationTitle = NSMutableAttributedString(string: "Declaration\n", attributes: titleAttributes)
+		
+		attributedString.append(declarationTitle)
+
 		attributedString.append(definitionAttrString)
 		
 		switch item.type {
-		case .function:
+		case .function(let functionDocumentation):
 			
-			let descr: String
+			let overviewTitle = NSMutableAttributedString(string: "Overview\n", attributes: titleAttributes)
 			
-			if let functionDoc = item.functionDocumentation {
-				descr = functionDoc.description ?? "No description"
-			} else {
-				descr = "No description"
-			}
+			attributedString.append(overviewTitle)
+			
+			let descr = functionDocumentation.description ?? "No description"
 			
 			let descrAttrString = NSAttributedString(string: descr + "\n", attributes: [.font: font])
 			
 			attributedString.append(descrAttrString)
 			
-			if let functionDoc = item.functionDocumentation {
+			if !functionDocumentation.arguments.isEmpty {
+				
+				let argumentsTitle = NSMutableAttributedString(string: "Parameters\n", attributes: titleAttributes)
+				
+				attributedString.append(argumentsTitle)
+				
+				for arg in functionDocumentation.arguments {
+					
+					let argNameParagraphStyle = NSMutableParagraphStyle()
+					argNameParagraphStyle.headIndent = 8
+					argNameParagraphStyle.firstLineHeadIndent = 8
+					
+					let argNameAttrString = NSAttributedString(string: "\(arg)\n", attributes: [.font: boldFont,
+																								  .paragraphStyle: argNameParagraphStyle])
+					
+					attributedString.append(argNameAttrString)
+					
+					let argDescrParagraphStyle = NSMutableParagraphStyle()
+					argDescrParagraphStyle.headIndent = 16
+					argDescrParagraphStyle.firstLineHeadIndent = 16
+					
+					let argDescr = (functionDocumentation.argumentDescriptions[arg] ?? "No description") + "\n"
 
-				for arg in functionDoc.arguments {
-					
-					let argDescr: String
-					
-					if let argDescription = functionDoc.argumentDescriptions[arg] {
-						argDescr = "\(arg): " + (argDescription ?? "No description")
-					} else {
-						argDescr = "\(arg): No description"
-					}
-					
-					let argDescrAttrString = NSAttributedString(string: argDescr + "\n", attributes: [.font: font])
+					let argDescrAttrString = NSAttributedString(string: argDescr + "\n", attributes: [.font: font,
+																									  .paragraphStyle: argDescrParagraphStyle])
 					
 					attributedString.append(argDescrAttrString)
 					
 				}
 				
-				if let returnDescription = functionDoc.returnDescription {
-					
-					let returnsDescr = "Returns: " + returnDescription
+			}
 
-					let returnsDescrAttrString = NSAttributedString(string: returnsDescr + "\n", attributes: [.font: font])
-					
-					attributedString.append(returnsDescrAttrString)
-					
-				}
+			if functionDocumentation.returns {
+				
+				let returnValueTitle = NSMutableAttributedString(string: "Return value\n", attributes: titleAttributes)
+				
+				attributedString.append(returnValueTitle)
+				
+				let returnsDescr = functionDocumentation.returnDescription ?? "No description"
+				
+				let returnsDescrAttrString = NSAttributedString(string: returnsDescr + "\n", attributes: [.font: font])
+				
+				attributedString.append(returnsDescrAttrString)
 				
 			}
-						
-		case .variable:
 			
-			let descr: String
+		case .variable(let variableDocumentation):
 			
-			if let variableDoc = item.variableDocumentation {
-				descr = variableDoc.description ?? "No description"
-			} else {
-				descr = "No description"
-			}
+			let overviewTitle = NSMutableAttributedString(string: "Overview\n", attributes: titleAttributes)
+			
+			attributedString.append(overviewTitle)
+			
+			let descr = variableDocumentation.description ?? "No description"
 			
 			let descrAttrString = NSAttributedString(string: descr + "\n", attributes: [.font: font])
 			
 			attributedString.append(descrAttrString)
 			
-		case .struct:
+		case .struct(let structDocumentation):
 			
-			let descr: String
+			let overviewTitle = NSMutableAttributedString(string: "Overview\n", attributes: titleAttributes)
 			
-			if let structDoc = item.structDocumentation {
-				descr = structDoc.description ?? "No description"
-			} else {
-				descr = "No description"
-			}
+			attributedString.append(overviewTitle)
+			
+			let descr = structDocumentation.description ?? "No description"
 			
 			let descrAttrString = NSAttributedString(string: descr + "\n", attributes: [.font: font])
 			
 			attributedString.append(descrAttrString)
 			
-			if let structDoc = item.structDocumentation {
+			let argumentsTitle = NSMutableAttributedString(string: "Parameters\n", attributes: titleAttributes)
+			
+			attributedString.append(argumentsTitle)
+			
+			for member in structDocumentation.members {
 				
-				for member in structDoc.members {
-					
-					let memberDescr: String
-					
-					if let memberDescription = structDoc.memberDescriptions[member] {
-						memberDescr = "\(member): " + (memberDescription ?? "No description")
-					} else {
-						memberDescr = "\(member): No description"
-					}
-					
-					let memberDescrAttrString = NSAttributedString(string: memberDescr + "\n", attributes: [.font: font])
-					
-					attributedString.append(memberDescrAttrString)
-					
-				}
+				let argNameParagraphStyle = NSMutableParagraphStyle()
+				argNameParagraphStyle.headIndent = 8
+				argNameParagraphStyle.firstLineHeadIndent = 8
+				
+				let argNameAttrString = NSAttributedString(string: "\(member)\n", attributes: [.font: boldFont,
+																							.paragraphStyle: argNameParagraphStyle])
+				
+				attributedString.append(argNameAttrString)
+				
+				let argDescrParagraphStyle = NSMutableParagraphStyle()
+				argDescrParagraphStyle.headIndent = 16
+				argDescrParagraphStyle.firstLineHeadIndent = 16
+				
+				let argDescr = (structDocumentation.memberDescriptions[member] ?? "No description") + "\n"
+				
+				let argDescrAttrString = NSAttributedString(string: argDescr + "\n", attributes: [.font: font,
+																								  .paragraphStyle: argDescrParagraphStyle])
+				
+				attributedString.append(argDescrAttrString)
 				
 			}
-			
 		}
 		
 		return attributedString

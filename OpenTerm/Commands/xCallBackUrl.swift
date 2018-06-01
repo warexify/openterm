@@ -64,41 +64,53 @@ public func xCallbackUrlOpen(_ url: URL) -> Bool {
 
 @_cdecl("openUrl")
 public func openUrl(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?) -> Int32 {
+	
+	let usage = """
+				usage: open-url app://x-callback-url/cmd
+
+				where standard input is url encoded and appended to url.
+
+				For x-callback-url's the command does not terminate until either x-success or x-error has been called and these parameters are automatically appended to the url.
+
+				"""
+	
+	guard let args = convertCArguments(argc: argc, argv: argv) else {
+		fputs(usage, thread_stderr)
+		return 1
+	}
+	
 	var url: URL? = nil
-	if argc == 2 {
-		let urlString = String(cString: argv![1]!)
-		url = URL(string: urlString)
+	
+	if args.count == 2 {
+		url = URL(string: args[1])
 	}
 
 	guard url != nil else {
-		fputs("""
-usage: open-url app://x-callback-url/cmd
-
-where standard input is url encoded and appended to url.
-
-For x-callback-url's the command does not terminate until either x-success or x-error has been called and these parameters are automatically appended to the url.
-
-""", thread_stderr)
+		fputs(usage, thread_stderr)
 		return 1
 	}
+
+	var urlString = url!.absoluteString
 
 	// shorthand to URL escape parameters
 	let escape: (String) -> String = { str in str.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)! }
 
-	// read everything from stdin and put this on url
-	var bytes = [Int8]()
-	while true {
-		var byte: Int8 = 0
-		let count = read(fileno(thread_stdin), &byte, 1)
-		guard count == 1 else {
-			break
+	// when stdin is not the terminal, we read everything from stdin and put this on url
+	let readStandardInput = ios_isatty(fileno(thread_stdin)) == 0
+	if readStandardInput {
+		var bytes = [Int8]()
+		while true {
+			var byte: Int8 = 0
+			let count = read(fileno(thread_stdin), &byte, 1)
+			guard count == 1 else {
+				break
+			}
+			bytes.append(byte)
 		}
-		bytes.append(byte)
-	}
-	var urlString = url!.absoluteString
-	let data = Data(bytes: bytes, count: bytes.count)
-	if let string = String(data: data, encoding: .utf8) {
-		urlString.append(escape(string))
+		let data = Data(bytes: bytes, count: bytes.count)
+		if let string = String(data: data, encoding: .utf8) {
+			urlString.append(escape(string))
+		}
 	}
 
 	let waitForCallback = url!.host == "x-callback-url"

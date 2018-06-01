@@ -30,7 +30,8 @@ class TerminalView: UIView {
 
 	var stdoutParser = Parser()
 	var stderrParser = Parser()
-	var currentCommandStartIndex: String.Index! {
+	
+	private var currentCommandStartIndex: String.Index! {
 		didSet {
 			updateAutoComplete()
 			updateCompletion()
@@ -113,7 +114,11 @@ class TerminalView: UIView {
 
 	var didEnterInput: ((String) -> Void)?
 	var subCommandParserDidEndTransmissionCallback: (() -> Void)?
+	var subCommandParserDidEndTransmissionCallbackCapturingOutput: ((String) -> Void)?
 
+	var captureOutput = false
+	var capturedOutput: String?
+	
 	weak var delegate: TerminalViewDelegate?
 
 	init() {
@@ -208,6 +213,11 @@ class TerminalView: UIView {
 	func appendText(_ text: NSAttributedString) {
 		
 		if text.string.isEmpty {
+			return
+		}
+		
+		if captureOutput {
+			capturedOutput = (capturedOutput ?? "") + text.string
 			return
 		}
 		
@@ -359,10 +369,9 @@ extension TerminalView {
 
 	@objc func completeCommand() {
 
-		guard
-			let firstCompletion = autoCompleteManager.completions.first,
-			currentCommand != firstCompletion.name
-			else { return }
+		guard let firstCompletion = autoCompleteManager.completions.first, currentCommand != firstCompletion.name else {
+			return
+		}
 
 		insertCompletion(firstCompletion)
 	}
@@ -372,12 +381,18 @@ extension TerminalView: ParserDelegate {
 
 	func parserDidEndTransmission(_ parser: Parser) {
 
-		if let callback = subCommandParserDidEndTransmissionCallback {
-			callback()
-			return
-		}
-		
 		DispatchQueue.main.async {
+
+			if let callback = self.subCommandParserDidEndTransmissionCallbackCapturingOutput {
+				callback(self.capturedOutput ?? "")
+				return
+			}
+			
+			if let callback = self.subCommandParserDidEndTransmissionCallback {
+				callback()
+				return
+			}
+			
 			self.writePrompt()
 		}
 	}
@@ -417,12 +432,37 @@ extension TerminalView: CommandExecutorDelegate {
 		
 	}
 	
-	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, callback: @escaping () -> Void) {
+	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, callback: @escaping (Int) -> Void) {
 		
 		subCommandParserDidEndTransmissionCallback = { [weak self] in
 			
 			self?.subCommandParserDidEndTransmissionCallback = nil
-			callback()
+			
+			let intStatus: Int
+			
+			if let status = self?.executor.context[.status] {
+				intStatus = Int(status) ?? 1
+			} else {
+				intStatus = 1
+			}
+			
+			callback(intStatus)
+		}
+		
+		commandExecutor.dispatch(subCommand)
+		
+	}
+	
+	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, capturingOutput callback: @escaping (String) -> Void) {
+		
+		captureOutput = true
+		
+		subCommandParserDidEndTransmissionCallbackCapturingOutput = { [weak self] (output) in
+			
+			self?.subCommandParserDidEndTransmissionCallbackCapturingOutput = nil
+			self?.capturedOutput = nil
+			self?.captureOutput = false
+			callback(output)
 		}
 		
 		commandExecutor.dispatch(subCommand)
@@ -468,16 +508,18 @@ extension TerminalView: UITextViewDelegate {
 
 	func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
 
+		// Use utf16, because NSRange uses that, and we need to compare its location.
+		let i = textView.text.utf16.distance(from: textView.text.utf16.startIndex, to: currentCommandStartIndex)
+		
+		if range.location < i {
+			return false
+		}
+		
 		switch executor.state {
 		case .running:
 			executor.sendInput(text)
 			return true
 		case .idle:
-			let i = textView.text.distance(from: textView.text.startIndex, to: currentCommandStartIndex)
-
-			if range.location < i {
-				return false
-			}
 
 			if text == "\n" {
 

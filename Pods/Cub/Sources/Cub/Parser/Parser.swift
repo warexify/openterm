@@ -289,7 +289,78 @@ public class Parser {
 			throw error(.unexpectedToken)
 		}
 		
-		return StringNode(value: value, range: currentToken.range)
+		var unescapedString = ""
+		
+		let validEscapingChars = ["0", "t", "n", "r", "'", "\"", "\\"]
+		
+		var isInEscape = false
+		
+		for (index, char) in value.enumerated() {
+			
+			if index == 0 {
+				
+				guard char == "\"" else {
+					throw error(.unexpectedToken, token: currentToken)
+				}
+				
+				continue
+			}
+			
+			if isInEscape {
+				
+				if index == value.count - 1 {
+					throw error(.unterminatedStringLiteral, token: currentToken)
+				}
+				
+				let charStr = String(char)
+				
+				guard validEscapingChars.contains(charStr) else {
+					throw error(.invalidEscapeSequenceInStringLiteral(sequence: charStr), token: currentToken)
+				}
+				
+				switch charStr {
+					
+				case "0":
+					unescapedString.append("\0")
+
+				case "t":
+					unescapedString.append("\t")
+
+				case "n":
+					unescapedString.append("\n")
+
+				case "r":
+					unescapedString.append("\r")
+
+				case "'":
+					unescapedString.append("\'")
+
+				default:
+					unescapedString.append(char)
+
+				}
+				
+				isInEscape = false
+				
+			} else if index == value.count - 1 {
+				
+				guard char == "\"" else {
+					throw error(.unterminatedStringLiteral, token: currentToken)
+				}
+				
+			} else {
+				
+				if char == "\\" {
+					isInEscape = true
+				} else {
+					unescapedString.append(char)
+				}
+			
+			}
+						
+		}
+		
+		return StringNode(value: unescapedString, range: currentToken.range)
 	}
 	
 	/// Expression can be a binary/bool op, member
@@ -583,12 +654,24 @@ public class Parser {
 		return CallNode(callee: name, arguments: arguments, range: currentToken.range)
 	}
 
+	var stackDepth = 0
+	
 	/// Primary can be seen as the start of an operation 
 	/// (e.g. boolean operation), where this function returns the first term
 	private func parsePrimary() throws -> ASTNode {
 
+		stackDepth += 1
+		
+		if stackDepth > 20 {
+			throw error(.stackOverflow)
+		}
+		
+		defer {
+			stackDepth -= 1
+		}
+		
 		guard let currentToken = peekCurrentToken() else {
-			throw error(.unexpectedToken)
+			throw error(.expectedExpression)
 		}
 		
 		if case .comment = currentToken.type {
@@ -658,10 +741,24 @@ public class Parser {
 			case .comment:
 				return try parseComment()
 			
+			case .nil:
+				return try parseNil()
+			
 			default:
 				throw error(.expectedExpression, token: currentToken)
 		}
-
+		
+	}
+	
+	private func parseNil() throws -> NilNode {
+		
+		guard let token = popCurrentToken(), case .nil = token.type else {
+			throw error(.internalInconsistencyOccurred, token: nil)
+		}
+		
+		let node = NilNode(range: token.range)
+		
+		return node
 	}
 	
 	private func parseComment() throws -> CommentNode {
@@ -693,7 +790,7 @@ public class Parser {
 
 	private func parseIfStatement() throws -> ConditionalStatementNode {
 
-		try popCurrentToken(andExpect: .if)
+		let ifToken = try popCurrentToken(andExpect: .if)
 
 		let condition = try parseExpression()
 
@@ -718,7 +815,7 @@ public class Parser {
 
 		} else {
 
-			return ConditionalStatementNode(condition: condition, body: body, range: currentTokenRange())
+			return ConditionalStatementNode(condition: condition, body: body, range: ifToken.range)
 
 		}
 
@@ -1174,8 +1271,17 @@ public class Parser {
 	private func error(_ type: ParseErrorType, token: Token? = nil) -> ParseError {
 
 		let token = token ?? peekCurrentToken() ?? peekPreviousToken()
+		
 		let range = token?.range
 
+		if let type = peekPreviousToken()?.type, case let .editorPlaceholder(placeholder) = type {
+			return ParseError(type: .editorPlaceholder(placeholder: placeholder), range: range)
+		}
+		
+		if let type = token?.type, case let .editorPlaceholder(placeholder) = type {
+			return ParseError(type: .editorPlaceholder(placeholder: placeholder), range: range)
+		}
+		
 		return ParseError(type: type, range: range)
 	}
 

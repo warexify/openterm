@@ -9,10 +9,16 @@
 import Foundation
 
 /// Interpreter Error
-public enum InterpreterErrorType: Error {
+public enum InterpreterErrorType: Error, Equatable {
 
 	/// Unexpected argument
 	case unexpectedArgument
+
+	/// Unexpected argument
+	case unexpectedArgumentExpectedNumber(found: ValueType)
+
+	/// Unexpected argument
+	case unexpectedArgumentExpectedBool
 
 	/// Illegal stack operation
 	case illegalStackOperation
@@ -27,7 +33,10 @@ public enum InterpreterErrorType: Error {
 	case underflow
 	
 	/// Array out of bounds
-	case arrayOutOfBounds
+	case arrayOutOfBounds(index: Int, arraySize: Int)
+
+	/// Out of memory
+	case outOfMemory
 
 }
 
@@ -36,33 +45,24 @@ extension InterpreterErrorType {
 	func description(atLine line: Int? = nil) -> String {
 		
 		if let line = line {
-			
-			switch self {
-			case .unexpectedArgument:
-				return "An unexpected argument was found on line \(line) during interpretation."
-				
-			case .illegalStackOperation:
-				return "An illegal stack operation was performed on line \(line) during interpretation."
-				
-			case .invalidRegister:
-				return "An invalid register was accessed on line \(line) during interpretation."
-				
-			case .stackOverflow:
-				return "A stack overflow occurred on line \(line) during interpretation."
-				
-			case .underflow:
-				return "An underflow occurred on line \(line) during interpretation."
-				
-			case .arrayOutOfBounds:
-				return "An array was accessed outside its bounds on line \(line) during interpretation."
-				
-			}
-			
+			return "Error on line \(line): \(description())"
+		} else {
+			return description()
 		}
+		
+	}
+	
+	func description() -> String {
 		
 		switch self {
 		case .unexpectedArgument:
 			return "An unexpected argument was found during interpretation."
+			
+		case .unexpectedArgumentExpectedNumber(let foundValue):
+			return "Expected a number during interpretation but found \(foundValue)."
+			
+		case .unexpectedArgumentExpectedBool:
+			return "An unexpected argument was found during interpretation, expected a boolean."
 			
 		case .illegalStackOperation:
 			return "An illegal stack operation was performed during interpretation."
@@ -76,8 +76,11 @@ extension InterpreterErrorType {
 		case .underflow:
 			return "An underflow occurred during interpretation."
 			
-		case .arrayOutOfBounds:
-			return "An array was accessed outside its bounds during interpretation."
+		case .arrayOutOfBounds(let index, let arraySize):
+			return "An array was accessed outside its bounds during interpretation, tried to access index \(index) in an array of length \(arraySize)."
+			
+		case .outOfMemory:
+			return "Out of memory."
 			
 		}
 		

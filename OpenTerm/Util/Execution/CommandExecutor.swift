@@ -15,7 +15,8 @@ protocol CommandExecutorDelegate: class {
 	func commandExecutor(_ commandExecutor: CommandExecutor, didChangeWorkingDirectory to: URL)
 	func commandExecutor(_ commandExecutor: CommandExecutor, stateDidChange newState: CommandExecutor.State)
 	func commandExecutor(_ commandExecutor: CommandExecutor, waitForInput callback: @escaping (String) -> Void)
-	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, callback: @escaping () -> Void)
+	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, callback: @escaping (Int) -> Void)
+	func commandExecutor(_ commandExecutor: CommandExecutor, executeSubCommand subCommand: String, capturingOutput callback: @escaping (String) -> Void)
 }
 
 // Exit status from an ios_system command
@@ -65,7 +66,7 @@ class CommandExecutor {
 	private let stderr_file: UnsafeMutablePointer<FILE>
 
 	/// Context from commands run by this executor
-	private var context = CommandExecutionContext()
+	var context = CommandExecutionContext()
 
 	init() {
 		self.currentWorkingDirectory = DocumentManager.shared.activeDocumentsFolderURL
@@ -170,10 +171,60 @@ class CommandExecutor {
 		
 		let program = components[0]
 		let args = Array(components[1..<components.endIndex])
+		
+		var parsedArgs = [String]()
+		
+		var currentArg = ""
+		
+		for arg in args {
+			
+			if arg.hasPrefix("\"") {
+				
+				if currentArg.isEmpty {
+
+					currentArg = arg
+					currentArg.removeFirst()
+					
+				} else {
+					
+					currentArg.append(" " + arg)
+					
+				}
+				
+			} else if arg.hasSuffix("\"") {
+
+				if currentArg.isEmpty {
+
+					currentArg.append(arg)
+
+				} else {
+					
+					currentArg.append(" " + arg)
+					currentArg.removeLast()
+					parsedArgs.append(currentArg)
+					currentArg = ""
+
+				}
+
+			} else {
+				
+				if currentArg.isEmpty {
+					parsedArgs.append(arg)
+				} else {
+					currentArg.append(" " + arg)
+				}
+				
+			}
+		
+		}
+		
+		if !currentArg.isEmpty {
+			parsedArgs.append(currentArg)
+		}
 
 		// Special case for scripts
 		if let scriptDocument = CommandManager.shared.script(named: program) {
-			return ScriptExecutorCommand(script: scriptDocument, arguments: args, context: context)
+			return ScriptExecutorCommand(script: scriptDocument, arguments: parsedArgs, context: context)
 		}
 
 		// Default case: Just execute the string itself

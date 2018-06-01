@@ -14,7 +14,7 @@
 <a href="https://travis-ci.org/louisdh/cub"><img src="https://travis-ci.org/louisdh/cub.svg?branch=master" alt="Travis build status"/></a>
 <a href="https://codecov.io/gh/louisdh/cub"><img src="https://codecov.io/gh/louisdh/cub/branch/master/graph/badge.svg" alt="Codecov"/></a>
 <br>
-<img src="https://img.shields.io/badge/version-0.8.2-blue.svg" style="max-height: 300px;" alt="version 0.8.2">
+<img src="https://img.shields.io/badge/version-1.0.1-blue.svg" style="max-height: 300px;" alt="version 1.0.1">
 <a href="https://github.com/Carthage/Carthage"><img src="https://img.shields.io/badge/Carthage-compatible-4bc51d.svg?style=flat" style="max-height: 300px;" alt="Carthage Compatible"/></a>
 <a href="https://developer.apple.com/swift/"><img src="https://img.shields.io/badge/Swift-4.1-orange.svg?style=flat" style="max-height: 300px;" alt="Swift"/></a>
 <img src="https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20Linux-lightgrey.svg" style="max-height: 300px;" alt="Platform: iOS macOS tvOS watchOS">
@@ -24,12 +24,12 @@
 <a href="https://paypal.me/louisdhauwe"><img src="https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat" alt="Donate via PayPal"/></a>
 </p>
 
-Cub is an **interpreted** scripting language inspired by Swift. This project includes a lexer, parser, compiler and interpreter. All of these are 100% written in Swift without dependencies. 
+Cub is an interpreted, dynamically typed, scripting language inspired by Swift. This project includes a lexer, parser, compiler and interpreter, all written in Swift.
 
+Cub is used for [OpenTerm](https://github.com/louisdh/openterm)'s scripting feature. A language guide is available in OpenTerm and [online](https://silverfox.be/cub/guide/index.html).
 Cub was derived from [Lioness](https://github.com/louisdh/lioness) (my first programming language).
 
-The standard library (abbreviated: stdlib) contains basic functions for number manipulation, including: max/min, ceil, floor, trigonometry, etc.
-
+The standard library (abbreviated: stdlib) contains basic utility functions, for example to convert from/to dates.
 
 ## Source examples
 The following Cub code calculates factorials recursively:
@@ -122,7 +122,7 @@ print("Hello world")
 Since the project does not rely on any dependencies, running it requires no setup. 
 
 ### macOS
-Open ```Cub.xcworkspace``` (preferably in the latest non-beta version of Xcode) and run the ```macOS Example``` target. The example will run the code in ```A.lion```. The output will be printed to the console.
+Open ```Cub.xcworkspace``` (preferably in the latest non-beta version of Xcode) and run the ```macOS Example``` target. The example will run the code in ```A.cub```. The output will be printed to the console.
 
 ## Installing framework
  
@@ -132,7 +132,7 @@ Add to your `Package.swift` file's `dependencies` section:
 
 ```swift
 .Package(url: "https://github.com/louisdh/cub.git",
-		         majorVersion: 0, minor: 8)
+		         majorVersion: 1, minor: 0)
 ```
 
 ### Using [CocoaPods](http://cocoapods.org)
@@ -140,28 +140,22 @@ Add to your `Package.swift` file's `dependencies` section:
 Add the following line to your ```Podfile```:
 
 ```ruby
-pod 'Cub', '~> 0.8'
+pod 'Cub', '~> 1.0'
 ```
 
 ### Using [Carthage](https://github.com/Carthage/Carthage)
 Add the following line to your ```Cartfile```:
 
 ```ruby
-github "louisdh/cub" ~> 0.8
+github "louisdh/cub" ~> 1.0
 ```
 Run ```carthage update``` to build the framework and drag the built ```Cub.framework``` into your Xcode project.
 
-
-## Standard Library
-*Please note: Cub is currently in beta*
-
-The Standard Library is currently under active development. There currently is no one document with everything from the stdlib. The best place to look for what's available is in [the source files](Sources/Cub/Standard%20Library/Sources/).
-
 ## Roadmap
 - [x] Structs
-- [ ] Completion suggestions  (given an incomplete source string and insertion point)
+- [x] Completion suggestions  (given an incomplete source string and insertion point)
 - [ ] Breakpoint support in interpreter
-- [ ] Stdlib documentation (Dash?)
+- [x] Stdlib documentation
 - [ ] Compiler warnings
 - [ ] Compiler optimizations
 - [x] Faster Lexer (without regex)

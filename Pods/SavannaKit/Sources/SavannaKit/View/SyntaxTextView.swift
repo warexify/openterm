@@ -41,10 +41,12 @@ struct ThemeInfo {
 }
 
 @IBDesignable
-public class SyntaxTextView: View {
+open class SyntaxTextView: View {
 
 	var previousSelectedRange: NSRange?
 	
+	private var textViewSelectedRangeObserver: NSKeyValueObservation?
+
 	let textView: InnerTextView
 	
 	public var contentTextView: TextView {
@@ -70,9 +72,9 @@ public class SyntaxTextView: View {
 		}
 	}
 	
-	public override var tintColor: UIColor! {
+	open override var tintColor: UIColor! {
 		didSet {
-			keyboardToolbar.tintColor = tintColor
+
 		}
 	}
 	
@@ -89,7 +91,7 @@ public class SyntaxTextView: View {
 	
 	#endif
 	
-	override convenience init(frame: CGRect) {
+	public override convenience init(frame: CGRect) {
 		self.init(.frame(frame))!
 	}
 	
@@ -117,12 +119,6 @@ public class SyntaxTextView: View {
 		
 		setup()
 	}
-	
-	#if os(iOS)
-
-		private var keyboardToolbar: UIToolbar!
-	
-	#endif
 
 	#if os(macOS)
 
@@ -202,8 +198,20 @@ public class SyntaxTextView: View {
 			textView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
 			textView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
 		
+			self.contentMode = .redraw
+			textView.contentMode = .topLeft
+		
+			textViewSelectedRangeObserver = contentTextView.observe(\UITextView.selectedTextRange) { [weak self] (textView, value) in
+			
+				if let `self` = self {
+					self.delegate?.didChangeSelectedRange(self, selectedRange: self.contentTextView.selectedRange)
+				}
+
+			}
+			
 		#endif
 		
+		textView.innerDelegate = self
 		textView.delegate = self
 		
 		textView.text = ""
@@ -213,6 +221,8 @@ public class SyntaxTextView: View {
 		
 		#if os(iOS)
 
+		backgroundColor = theme.backgroundColor
+
 		textView.autocapitalizationType = .none
 		textView.keyboardType = .default
 		textView.autocorrectionType = .no
@@ -220,26 +230,11 @@ public class SyntaxTextView: View {
 			
 		if #available(iOS 11.0, *) {
 			textView.smartQuotesType = .no
+			textView.smartInsertDeleteType = .no
 		}
 			
 		textView.keyboardAppearance = .dark
-		
-		
-		keyboardToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 300, height: 50.0))
-		
-		let equalsBtn = UIBarButtonItem(title: "=", style: .plain, target: self, action: #selector(test))
-		
-		let font = UIFont.systemFont(ofSize: 44.0)
-		let attributes = [NSAttributedStringKey.font : font]
 
-		equalsBtn.setTitleTextAttributes(attributes, for: .normal)
-		
-		keyboardToolbar.items = [equalsBtn]
-		
-//		textView.inputAccessoryView = keyboardToolbar
-		
-//		equalsBtn.tintColor = .red
-		
 		self.clipsToBounds = true
 		
 		#endif
@@ -248,7 +243,7 @@ public class SyntaxTextView: View {
 	
 	#if os(macOS)
 	
-	public override func viewDidMoveToSuperview() {
+	open override func viewDidMoveToSuperview() {
 		super.viewDidMoveToSuperview()
 	
 	}
@@ -274,7 +269,7 @@ public class SyntaxTextView: View {
 	
 	#if os(iOS)
 
-	public override var isFirstResponder: Bool {
+	override open var isFirstResponder: Bool {
 		return textView.isFirstResponder
 	}
 	
@@ -350,7 +345,7 @@ public class SyntaxTextView: View {
 		self.textView.setNeedsDisplay()
 	}
 	
-	override public func layoutSubviews() {
+	override open func layoutSubviews() {
 		super.layoutSubviews()
 		
 		self.textView.invalidateCachedParagraphs()
@@ -442,7 +437,7 @@ public class SyntaxTextView: View {
 
 		let selectedRange = textView.selectedRange
 		
-		let fullRange = NSRange(location: 0, length: source.count)
+		let fullRange = NSRange(location: 0, length: (source as NSString).length)
 		
 		var rangesToUpdate = [(NSRange, EditorPlaceholderState)]()
 		
@@ -497,7 +492,7 @@ public class SyntaxTextView: View {
 		paragraphStyle.defaultTabInterval = themeInfo.spaceWidth * 4
 		paragraphStyle.tabStops = []
 		
-		let wholeRange = NSRange(location: 0, length: source.count)
+		let wholeRange = NSRange(location: 0, length: (source as NSString).length)
 		
 		attributes[.foregroundColor] = theme.color(for: .plain)
 		attributes[.font] = theme.font

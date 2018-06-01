@@ -90,7 +90,7 @@ public class Lexer {
 
 	private static let invertedValidNumberCharSet = validNumberCharSet.inverted
 	
-	private let input: String
+	public let input: String
 	private var content: String
 
 	private var isInLineComment = false
@@ -98,6 +98,7 @@ public class Lexer {
 	private var isInIdentifier = false
 	private var isInNumber = false
 	private var isInString = false
+	private var isInEscapedSubstring = false
 	private var isInEditorPlaceholder = false
 
 	private var charIndex = 0
@@ -341,15 +342,33 @@ public class Lexer {
 				continue
 			}
 			
+			if isInEscapedSubstring {
+
+				if !content.isEmpty {
+					consumeCharactersAtStart(1, updateCurrentString: true)
+				}
+				
+				isInEscapedSubstring = false
+
+				continue
+			}
+			
 			if isInString && content.hasPrefix("\"") {
 				
 				consumeCharactersAtStart(1, updateCurrentString: true)
 				isInString = false
+				isInEscapedSubstring = false
 				
-				var rawString = currentString
-				rawString.removeFirst()
-				rawString.removeLast()
-				addToken(type: .string(rawString))
+				addToken(type: .string(currentString))
+				continue
+			}
+			
+			if isInString && !isInEscapedSubstring && content.hasPrefix("\\") {
+
+				isInEscapedSubstring = true
+			
+				consumeCharactersAtStart(1, updateCurrentString: true)
+				
 				continue
 			}
 			
@@ -436,6 +455,12 @@ public class Lexer {
 			
 			let updateCurrentString = isInString || isInBlockComment
 
+			if isInString {
+				isInString = false
+				isInEscapedSubstring = false
+				addToken(type: .string(currentString))
+			}
+			
 			consumeCharactersAtStart(1, updateCurrentString: updateCurrentString)
 			
 			if isInLineComment {

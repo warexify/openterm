@@ -64,6 +64,10 @@ class PridelandDocument: UIDocument {
 			throw PridelandDocumentError.invalidDocument
 		}
 		
+		guard fileWrapper.isDirectory else {
+			throw PridelandDocumentError.invalidDocument
+		}
+		
 		guard let wrappers = fileWrapper.fileWrappers else {
 			throw PridelandDocumentError.invalidDocument
 		}
@@ -95,6 +99,12 @@ class PridelandDocument: UIDocument {
 		self.text = text
 		self.metadata = metadata
 		
+	}
+
+	// Disable document reverting, which can cause internal exceptions
+	// when an open document is edited from a different app or device.
+	override func revert(toContentsOf url: URL, completionHandler: ((Bool) -> Void)? = nil) {
+		completionHandler?(false)
 	}
 	
 }

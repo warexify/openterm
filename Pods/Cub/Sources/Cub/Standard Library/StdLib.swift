@@ -10,7 +10,7 @@ import Foundation
 
 public class StdLib {
 
-	private let sources = ["Arithmetic", "Graphics"]
+	private let sources = ["Arithmetic", "String"]
 
 	public init() {
 
@@ -53,6 +53,200 @@ public class StdLib {
 	}
 	
 	func registerExternalFunctions(_ runner: Runner) {
+		
+		let stringAtRangeDoc = """
+							Returns part of a string, given a range.
+							- Parameter string: the string to get a part from.
+							- Parameter range: the range of the part in the string you want.
+							- Returns: the part of the string, for the given range.
+							"""
+		runner.registerExternalFunction(documentation: stringAtRangeDoc, name: "stringAtRange", argumentNames: ["string", "range"], returns: true) { (arguments, callback) in
+			
+			guard case let .string(string)? = arguments["string"], case let .struct(rangeData)? = arguments["range"] else {
+				_ = callback(.nil)
+				return
+			}
+		
+			guard let lowerboundId = runner.compiler.getStructMemberId(for: "lowerbound") else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard let upperboundId = runner.compiler.getStructMemberId(for: "upperbound") else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard let lowerboundRaw = rangeData.members[lowerboundId], case let .number(lowerbound) = lowerboundRaw else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard let upperboundRaw = rangeData.members[upperboundId], case let .number(upperbound) = upperboundRaw else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard Int(lowerbound) < Int(upperbound) else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard Int(lowerbound) >= 0 else {
+				_ = callback(.nil)
+				return
+			}
+			
+			guard Int(upperbound) <= string.count else {
+				_ = callback(.nil)
+				return
+			}
+			
+			let rangeLower = string.index(string.startIndex, offsetBy: Int(lowerbound))
+			let rangeUpper = string.index(string.startIndex, offsetBy: Int(upperbound))
+
+			let range = rangeLower..<rangeUpper
+			
+			_ = callback(.string(String(string[range])))
+
+		}
+		
+		#if !os(Linux)
+		
+			let regexDoc = """
+							Get an array of ranges for all the matches of a regular expression in a given string.
+							- Parameter pattern: the regular expression pattern. Cub uses the same regular expressions as Apple does, more info can be found here: https://developer.apple.com/documentation/foundation/nsregularexpression#1965589.
+							- Parameter string: the string to match the regular expression on.
+							- Returns: an array of ranges for all the matches of the regular expression in the provided string.
+							"""
+		
+			runner.registerExternalFunction(documentation: regexDoc, name: "regex", argumentNames: ["pattern", "string"], returns: true) { (arguments, callback) in
+				
+				guard case let .string(pattern)? = arguments["pattern"], case let .string(text)? = arguments["string"] else {
+					_ = callback(.nil)
+					return
+				}
+
+				guard let regEx = try? NSRegularExpression(pattern: pattern, options: []) else {
+					_ = callback(.nil)
+					return
+				}
+				
+				let matches = regEx.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+				
+				let ranges = matches.compactMap({ Range<String.Index>.init($0.range, in: text) })
+				
+				var cubRanges = [ValueType]()
+				
+				for range in ranges {
+					
+					guard let lowerboundId = runner.compiler.getStructMemberId(for: "lowerbound") else {
+						continue
+					}
+					
+					guard let upperboundId = runner.compiler.getStructMemberId(for: "upperbound") else {
+						continue
+					}
+					
+					let lowerbound = text.distance(from: text.startIndex, to: range.lowerBound)
+					let upperbound = text.distance(from: text.startIndex, to: range.upperBound)
+
+					cubRanges.append(.struct(StructData(members: [lowerboundId: .number(NumberType(lowerbound)),
+																  upperboundId: .number(NumberType(upperbound))])))
+				}
+				
+				_ = callback(.array(cubRanges))
+				
+			}
+		
+		#endif
+		
+		let isEmptyDoc = """
+						Check if a value is empty.
+						- Parameter value: the value to check wether it's empty.
+						- Returns: true if the value is empty, false otherwise.
+						"""
+		
+		runner.registerExternalFunction(documentation: isEmptyDoc, name: "isEmpty", argumentNames: ["value"], returns: true) { (arguments, callback) in
+			
+			guard let value = arguments["value"] else {
+				_ = callback(.nil)
+				return
+			}
+			
+			_ = callback(.bool(value.size == 0))
+			
+		}
+		
+		let sizeOfDoc = """
+						Get the size of a value.
+						For arrays this returns the number of elements in the array.
+						For strings this returns the length.
+						- Parameter value: the value to get the size of.
+						- Returns: size of value.
+						"""
+		
+		runner.registerExternalFunction(documentation: sizeOfDoc, name: "sizeOf", argumentNames: ["value"], returns: true) { (arguments, callback) in
+			
+			guard let value = arguments["value"] else {
+				_ = callback(.nil)
+				return
+			}
+			
+			_ = callback(.number(value.size))
+			
+		}
+		
+		let splitDoc = """
+						Split a string into smaller strings.
+						- Parameter string: the string to split.
+						- Parameter separator: the separator to split by.
+						- Returns: an array of strings.
+						"""
+		
+		runner.registerExternalFunction(documentation: splitDoc, name: "split", argumentNames: ["string", "separator"], returns: true) { (arguments, callback) in
+			
+			guard case let .string(value)? = arguments["string"], case let .string(separator)? = arguments["separator"] else {
+				_ = callback(.nil)
+				return
+			}
+			
+			let splitted = value.unescaped.components(separatedBy: separator.unescaped)
+			_ = callback(.array(splitted.map({ ValueType.string($0) })))
+
+		}
+		
+		let exitDoc = """
+						Terminate the program.
+						"""
+		
+		runner.registerExternalFunction(documentation: exitDoc, name: "exit", argumentNames: [], returns: true) { (arguments, callback) in
+			
+			runner.interpreter?.isManuallyTerminated = true
+			_ = callback(.nil)
+			
+		}
+		
+		let parseNumberDoc = """
+						Tries to parse a string to a number.
+						- Parameter value: the string to parse.
+						- Returns: a number if the string could be parsed, otherwise nil.
+						"""
+		
+		runner.registerExternalFunction(documentation: parseNumberDoc, name: "parseNumber", argumentNames: ["string"], returns: true) { (arguments, callback) in
+			
+			guard case let .string(value)? = arguments["string"] else {
+				_ = callback(.nil)
+				return
+			}
+			
+			if let numberValue = NumberType(value) {
+				_ = callback(.number(numberValue))
+			} else {
+				_ = callback(.nil)
+			}
+				
+		}
 		
 		let isNumberDoc = """
 						Checks if the value is a number.
@@ -157,7 +351,7 @@ public class StdLib {
 			guard case let .number(value)? = arguments["value"],
 				case let .string(unit)? = arguments["unit"],
 				case let .number(dateString)? = arguments["date"] else {
-				_ = callback(.number(0))
+				_ = callback(.nil)
 				return
 			}
 			
@@ -173,12 +367,12 @@ public class StdLib {
 																  "year": .year]
 
 			guard let component = componentMapping[unit] else {
-				_ = callback(.number(0))
+				_ = callback(.nil)
 				return
 			}
 			
 			guard let newDate = Calendar.current.date(byAdding: component, value: intValue, to: date) else {
-				_ = callback(.number(0))
+				_ = callback(.nil)
 				return
 			}
 			
@@ -209,7 +403,7 @@ public class StdLib {
 		runner.registerExternalFunction(documentation: dateFromFormatDoc, name: "dateFromFormat", argumentNames: ["dateString", "format"], returns: true) { (arguments, callback) in
 			
 			guard case let .string(dateString)? = arguments["dateString"], case let .string(format)? = arguments["format"] else {
-				_ = callback(.number(0))
+				_ = callback(.nil)
 				return
 			}
 			
@@ -239,7 +433,7 @@ public class StdLib {
 		runner.registerExternalFunction(documentation: formattedDateDoc, name: "formattedDate", argumentNames: ["date", "format"], returns: true) { (arguments, callback) in
 
 			guard case let .number(timeInterval)? = arguments["date"], case let .string(format)? = arguments["format"] else {
-				_ = callback(.number(0))
+				_ = callback(.nil)
 				return
 			}
 			
@@ -306,12 +500,12 @@ public class StdLib {
 			var arguments = arguments
 			
 			guard let input = arguments.removeValue(forKey: "input") else {
-				_ = callback(.string(""))
+				_ = callback(.nil)
 				return
 			}
 			
 			guard case let .string(inputStr) = input else {
-				_ = callback(.string(""))
+				_ = callback(.nil)
 				return
 			}
 			
@@ -332,11 +526,13 @@ public class StdLib {
 					break
 				case .array:
 					break
+				case .nil:
+					break
 				}
 				
 			}
 			
-			let output = String(format: inputStr, arguments: varArgs)
+			let output = String(format: inputStr.unescaped, arguments: varArgs)
 			
 			_ = callback(.string(output))
 			return
@@ -350,4 +546,19 @@ public class StdLib {
 		case resourceNotFound
 	}
 
+}
+
+public extension String {
+	
+	public var unescaped: String {
+		let entities = ["\0", "\t", "\n", "\r", "\"", "\'", "\\"]
+		var current = self
+		for entity in entities {
+			let descriptionCharacters = entity.debugDescription.dropFirst().dropLast()
+			let description = String(descriptionCharacters)
+			current = current.replacingOccurrences(of: description, with: entity)
+		}
+		return current
+	}
+	
 }
