@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 					if let error = error {
 						print("Indexing error: \(error.localizedDescription)")
 					} else {
-						print("Search item successfully indexed!")
+						// print("Search item successfully indexed!")
 					}
 				}
 				

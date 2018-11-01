@@ -79,11 +79,14 @@ extension NSAttributedString {
                     if found {
                         // mark as link
                         let url = URL(fileURLWithPath: currentDirectory).appendingPathComponent(filename)
-						let attrs: [NSAttributedStringKey: Any] = [.link: url,
-																   .underlineStyle: NSUnderlineStyle.styleSingle.rawValue]
+						let nsRange = NSRange(location: range.lowerBound.encodedOffset,
+											  length: range.upperBound.encodedOffset -  range.lowerBound.encodedOffset)
+						var nsPreviousRange = NSRange()
+						var previousAttrs = self.attributes(at: range.lowerBound.encodedOffset, effectiveRange: &nsPreviousRange)
+						// This doesn't work (for now)
+						let attrs: [NSAttributedStringKey: Any] = [.link: url, .foregroundColor: previousAttrs[.foregroundColor]] //,
+																   // .underlineStyle: NSUnderlineStyle.styleSingle.rawValue]
 						
-                        let nsRange = NSRange(location: range.lowerBound.encodedOffset,
-                                              length: range.upperBound.encodedOffset -  range.lowerBound.encodedOffset)
                         mutable.addAttributes(attrs, range: nsRange)
 
                         pos = range.upperBound

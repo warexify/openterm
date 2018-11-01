@@ -260,7 +260,10 @@ class TerminalView: UIView {
 	}
 	
 	func writeOutput(_ string: NSAttributedString) {
-		let withLinks = string.withFilesAsLinks(currentDirectory: executor.currentWorkingDirectory.path)
+		// This should be made an option in the preferences.
+		// With ".withFilesAsLinks()", you can click on a file name, but you don't have the color typesetting in ls.
+		// Without it, you have the colors in ls, but no links
+		let withLinks = string // .withFilesAsLinks(currentDirectory: executor.currentWorkingDirectory.path)
 
 		performOnMain {
 			self.appendText(withLinks)
