@@ -188,9 +188,9 @@ struct ANSITextState {
 	var attributes: [NSAttributedString.Key: Any] {
 		return [
 			.foregroundColor: foregroundColor,
-			.underlineStyle: isUnderlined ? NSUnderlineStyle.single.rawValue : NSUnderlineStyle.none.rawValue,
+			.underlineStyle: isUnderlined ? NSUnderlineStyle.single.rawValue : 0,
 			.underlineColor: foregroundColor,
-			.strikethroughStyle: isStrikethrough ? NSUnderlineStyle.single.rawValue : NSUnderlineStyle.none.rawValue,
+			.strikethroughStyle: isStrikethrough ? NSUnderlineStyle.single.rawValue : 0,
 			.strikethroughColor: foregroundColor,
 			.font: font
 		]

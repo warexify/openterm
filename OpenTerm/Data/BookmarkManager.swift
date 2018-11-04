@@ -63,7 +63,7 @@ class BookmarkManager {
 					var isStale = true
 
 					// Try to obtain the URL from the bookmark.
-					if let loadedBookmarkURL = try URL(resolvingBookmarkData: loadedBookmark, bookmarkDataIsStale: &isStale) {
+					if let loadedBookmarkURL = try? URL(resolvingBookmarkData: loadedBookmark, bookmarkDataIsStale: &isStale) {
 
 						/**
 						*  If the bookmark is stale, we create a new bookmark
