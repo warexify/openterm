@@ -133,9 +133,9 @@ class TerminalViewController: UIViewController {
 		
 		updateTitle()
 
-		NotificationCenter.default.addObserver(self, selector: #selector(didDismissKeyboard), name: .UIKeyboardDidHide, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(didDismissKeyboard), name: UIResponder.keyboardDidHideNotification, object: nil)
 
-		NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: .UIApplicationDidEnterBackground, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
 
 		initializeEnvironment()
 		replaceCommand("open-url", "openUrl", true)
@@ -328,8 +328,8 @@ class TerminalViewController: UIViewController {
 	override var keyCommands: [UIKeyCommand]? {
 		return [
 			// Navigation between commands
-			UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectPreviousCommand), discoverabilityTitle: "Previous command"),
-			UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectNextCommand), discoverabilityTitle: "Next command")
+			UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectPreviousCommand), discoverabilityTitle: "Previous command"),
+			UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(selectNextCommand), discoverabilityTitle: "Next command")
 		]
 	}
 

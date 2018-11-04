@@ -150,7 +150,7 @@ public func openUrl(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer
 	url = URL(string: urlString)
 
 	DispatchQueue.main.async {
-		UIApplication.shared.open(url!, options: [:], completionHandler: { ok in
+		UIApplication.shared.open(url!, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: { ok in
 			let callbackNow = !ok || !waitForCallback
 			if callbackNow {
 				if let callback = xCallbacks[uuid] {
@@ -183,4 +183,9 @@ public func openUrl(argc: Int32, argv: UnsafeMutablePointer<UnsafeMutablePointer
 	write(outputFile, "\n", 1)
 
 	return returnCode
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

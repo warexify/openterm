@@ -65,7 +65,7 @@ class TerminalTextView: UITextView {
 		NotificationCenter.default.addObserver(self, selector: #selector(self.updateAppearanceFromSettingsAnimated), name: .appearanceDidChange, object: nil)
 		
 		let caDisplayLink = CADisplayLink(target: self, selector: #selector(update))
-		caDisplayLink.add(to: .main, forMode: .commonModes)
+		caDisplayLink.add(to: .main, forMode: RunLoop.Mode.common)
 		
 		NotificationCenter.default.addObserver(self, selector: #selector(setCaretStyle), name: .caretStyleDidChange, object: nil)
 	}

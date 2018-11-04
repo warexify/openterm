@@ -179,24 +179,24 @@ struct ANSITextState {
 	var isUnderlined: Bool = false
 	var isStrikethrough: Bool = false
 	var font: UIFont = ANSITextState.font(fromTraits: [])
-	var fontTraits: UIFontDescriptorSymbolicTraits = [] {
+	var fontTraits: UIFontDescriptor.SymbolicTraits = [] {
 		didSet {
 			self.font = ANSITextState.font(fromTraits: fontTraits)
 		}
 	}
 
-	var attributes: [NSAttributedStringKey: Any] {
+	var attributes: [NSAttributedString.Key: Any] {
 		return [
 			.foregroundColor: foregroundColor,
-			.underlineStyle: isUnderlined ? NSUnderlineStyle.styleSingle.rawValue : NSUnderlineStyle.styleNone.rawValue,
+			.underlineStyle: isUnderlined ? NSUnderlineStyle.single.rawValue : 0,
 			.underlineColor: foregroundColor,
-			.strikethroughStyle: isStrikethrough ? NSUnderlineStyle.styleSingle.rawValue : NSUnderlineStyle.styleNone.rawValue,
+			.strikethroughStyle: isStrikethrough ? NSUnderlineStyle.single.rawValue : 0,
 			.strikethroughColor: foregroundColor,
 			.font: font
 		]
 	}
 
-	private static func font(fromTraits traits: UIFontDescriptorSymbolicTraits) -> UIFont {
+	private static func font(fromTraits traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
 		let textSize = CGFloat(UserDefaultsController.shared.terminalFontSize)
 		var descriptor = UIFontDescriptor(name: "Menlo", size: textSize)
 		if let traitDescriptor = descriptor.withSymbolicTraits(traits) {

@@ -57,7 +57,7 @@ class CustomTextView: UITextView {
 	
 	private func setup() {
 		
-		NotificationCenter.default.addObserver(self, selector: #selector(self.textDidChange), name: .UITextViewTextDidChange, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(self.textDidChange), name: UITextView.textDidChangeNotification, object: nil)
 		
 		placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
 		placeholderLabel.textColor = .lightGray

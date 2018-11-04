@@ -42,7 +42,7 @@ class CubDocumentationItemViewController: UIViewController {
 		paragraphStyle.paragraphSpacingBefore = 16
 		paragraphStyle.paragraphSpacing = 8
 
-		let titleAttributes: [NSAttributedStringKey: Any] = [.foregroundColor: UIColor.white,
+		let titleAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white,
 															 .font: titleFont,
 															 .paragraphStyle: paragraphStyle]
 		
