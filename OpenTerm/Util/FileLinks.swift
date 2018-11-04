@@ -84,7 +84,7 @@ extension NSAttributedString {
 						var nsPreviousRange = NSRange()
 						var previousAttrs = self.attributes(at: range.lowerBound.encodedOffset, effectiveRange: &nsPreviousRange)
 						// This doesn't work (for now)
-						let attrs: [NSAttributedStringKey: Any] = [.link: url, .foregroundColor: previousAttrs[.foregroundColor]] //,
+						let attrs: [NSAttributedString.Key: Any] = [.link: url, .foregroundColor: previousAttrs[.foregroundColor]] //,
 																   // .underlineStyle: NSUnderlineStyle.styleSingle.rawValue]
 						
                         mutable.addAttributes(attrs, range: nsRange)

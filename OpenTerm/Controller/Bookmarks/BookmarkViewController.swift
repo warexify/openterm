@@ -104,7 +104,7 @@ extension BookmarkViewController: UITableViewDataSource {
 	}
 
 	//  Enable deleting a bookmark by swiping the corresponding cell.
-	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 
 		//  If the bookmark should be deleted...
 		if editingStyle == .delete {

@@ -147,7 +147,7 @@ extension UITableView: CollectionView {
 	///   - oldElements: The elements in the table view before the update.
 	///   - newElements: The elements in the table view after the update.
 	///   - animation: Row animation to use. Default is `automatic`.
-	func update<T: Equatable>(section: Int, from oldElements: [T], to newElements: [T], animation: UITableViewRowAnimation = .automatic) {
+	func update<T: Equatable>(section: Int, from oldElements: [T], to newElements: [T], animation: UITableView.RowAnimation = .automatic) {
 
 		update(section: section, from: oldElements, to: newElements, onMoveItem: { (atIndexPath, toIndexPath) in
 
