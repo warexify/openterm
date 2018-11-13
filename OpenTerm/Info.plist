@@ -85,7 +85,7 @@
 	<string>Save photos (e.g. via the share command)</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
-		<key>iCloud.com.silverfox.Terminal</key>
+		<key>iCloud.org.warexify.Terminal</key>
 		<dict>
 			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
 			<true/>

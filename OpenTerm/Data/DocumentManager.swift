@@ -30,7 +30,7 @@ class DocumentManager {
 
 	}
 
-	private let ICLOUD_IDENTIFIER = "iCloud.com.silverfox.Terminal"
+	private let ICLOUD_IDENTIFIER = "iCloud.org.warexify.Terminal"
 
 	private var localDocumentsURL: URL {
 		return fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
